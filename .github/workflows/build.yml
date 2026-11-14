@@ -1,0 +1,52 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  firmware:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/cache@v4
+        with:
+          path: ~/.platformio
+          key: pio-${{ hashFiles('firmware/platformio.ini') }}
+      - name: Install PlatformIO
+        run: pip install platformio
+      - name: Unit tests (native)
+        working-directory: firmware
+        run: pio test -e native
+      - name: Build
+        working-directory: firmware
+        run: pio run -e master -e child -e child_c3
+      - name: Collect binaries
+        run: |
+          mkdir -p dist
+          for env in master child child_c3; do
+            cp firmware/.pio/build/$env/firmware.bin dist/$env.bin
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: dist/
+
+  enclosure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install build123d
+        run: pip install build123d
+      - name: Generate STL / STEP
+        run: python hardware/enclosure/enclosure.py --stl out/stl --step out/step
+      - uses: actions/upload-artifact@v4
+        with:
+          name: enclosure
+          path: out/
