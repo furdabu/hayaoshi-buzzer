@@ -30,12 +30,12 @@ namespace {
 using proto::Result;
 using proto::RoundState;
 
-constexpr uint32_t kGreen = 0x00FF00;
 constexpr uint32_t kRed = 0xFF0000;
 constexpr uint32_t kPurple = 0x7000FF;
-constexpr uint16_t kLedsPerLamp = MASTER_LEDS_PER_LAMP;  // 0〜N-1: 緑, N〜2N-1: 赤
+constexpr uint32_t kCorrectColor = CORRECT_COLOR;      // 正解
+constexpr uint32_t kIncorrectColor = INCORRECT_COLOR;  // 不正解
 
-Lamp g_lamp(PIN_LAMP, kLedsPerLamp * 2, LAMP_BRIGHTNESS);
+Lamp g_lamp(PIN_LAMP, MASTER_LAMP_LEDS, LAMP_BRIGHTNESS);  // 中央のランプ 1 個
 Registry g_registry;
 buzzer::Arbiter g_arbiter(static_cast<int64_t>(ARBITRATION_WINDOW_MS) * 1000,
                           static_cast<int64_t>(EARLY_TOLERANCE_MS) * 1000);
@@ -170,7 +170,7 @@ void handleHello(const RxPacket& rx) {
 
   uint8_t id = g_registry.idOf(rx.mac);
   if (id == 0 && !g_registerMode) {
-    // 未登録の子機には空いている番号を自動で割り当てる
+    // 未登録の子機には次の番号 (登録済みの台数 + 1) を自動で割り当てる
     id = g_registry.assign(rx.mac, nowMs);
     if (id != 0) {
       Serial.printf("[join] #%u = %s\n", id, radio::macToString(rx.mac).c_str());
@@ -254,13 +254,12 @@ void processBroadcast(uint32_t nowMs) {
   }
 }
 
+// 中央のランプ: 正解 = 赤 / 不正解 = 青 (JUDGE_LAMP_MS の間)、番号登録モード = 紫でゆっくり明滅
 void renderLamps(uint32_t nowMs) {
-  uint32_t green = 0;
-  uint32_t red = 0;
+  uint32_t color = 0;
 
   if (g_registerMode) {
-    const uint8_t level = Lamp::breathe(nowMs, 2000, 10, 140);
-    green = red = Lamp::scale(kPurple, level);
+    color = Lamp::scale(kPurple, Lamp::breathe(nowMs, 2000, 10, 140));
   } else if (g_lampResult != Result::None) {
     const uint32_t elapsed = nowMs - g_lampResultSinceMs;
     if (JUDGE_LAMP_MS > 0 && elapsed >= static_cast<uint32_t>(JUDGE_LAMP_MS)) {
@@ -268,23 +267,16 @@ void renderLamps(uint32_t nowMs) {
     } else {
       // 最初の 0.6 秒は点滅、その後は点灯
       const bool on = elapsed >= 600 || (elapsed / 100) % 2 == 0;
-      if (on) {
-        if (g_lampResult == Result::Correct) {
-          green = kGreen;
-        } else {
-          red = kRed;
-        }
-      }
+      if (on) color = g_lampResult == Result::Correct ? kCorrectColor : kIncorrectColor;
     }
   }
 
-  // 親機の電池残量わずか: 何も表示していないときに 4 秒ごとに赤ランプが短く光る
-  if (green == 0 && red == 0 && battery::low() && (nowMs % 4000) < 150) {
-    red = Lamp::scale(kRed, 80);
+  // 親機の電池残量わずか: 何も表示していないときに 4 秒ごとに赤く短く光る
+  if (color == 0 && battery::low() && (nowMs % 4000) < 150) {
+    color = Lamp::scale(kRed, 80);
   }
 
-  g_lamp.fill(green, 0, kLedsPerLamp);
-  g_lamp.fill(red, kLedsPerLamp, kLedsPerLamp);
+  g_lamp.fill(color);
   g_lamp.show();
 }
 
@@ -349,12 +341,12 @@ bool checkRegisterModeAtBoot() {
   return true;
 }
 
+// 起動時のランプ確認: 正解の色 → 不正解の色
 void lampTest() {
-  g_lamp.fill(kGreen, 0, kLedsPerLamp);
+  g_lamp.fill(kCorrectColor);
   g_lamp.show();
   delay(300);
-  g_lamp.clear();
-  g_lamp.fill(kRed, kLedsPerLamp, kLedsPerLamp);
+  g_lamp.fill(kIncorrectColor);
   g_lamp.show();
   delay(300);
   g_lamp.clear();
@@ -366,7 +358,7 @@ void shutdownForLowBattery() {
   Serial.println(F("[battery] 電池切れ寸前のため停止します。充電してから電源を入れ直してください"));
   if (PIN_JUDGE_LED >= 0) analogWrite(PIN_JUDGE_LED, 0);
   for (int i = 0; i < 3; ++i) {
-    g_lamp.fill(Lamp::scale(kRed, 120), kLedsPerLamp, kLedsPerLamp);
+    g_lamp.fill(Lamp::scale(kRed, 120));
     g_lamp.show();
     delay(150);
     g_lamp.clear();

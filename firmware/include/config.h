@@ -1,7 +1,8 @@
 // ============================================================================
 //  早押しボタン 設定ファイル
 //  ピン番号や動作パラメータはここで変更できます。
-//  platformio.ini の build_flags で -DNAME=値 を指定しても上書きできます。
+//  #ifndef で囲まれた値は、platformio.ini の build_flags で -DNAME=値 を指定しても上書きできます
+//  (末尾の「通信タイミング」とバージョン番号は config.h を直接書き換えてください)。
 // ============================================================================
 #pragma once
 
@@ -35,10 +36,18 @@
 #define ARBITRATION_WINDOW_MS 50
 #endif
 
-// 判定ランプ (正解=緑 / 不正解=赤) を点灯しておく時間 (ms)。
+// 親機の判定ランプ (正解=赤 / 不正解=青) を点灯しておく時間 (ms)。
 // 0 にすると次に誰かがボタンを押すまで点灯し続ける。
 #ifndef JUDGE_LAMP_MS
 #define JUDGE_LAMP_MS 5000
+#endif
+
+// 判定の色 (0xRRGGBB)。親機のランプと、判定された子機の点滅に使う。ボタンの色 (正解=赤 / 不正解=青) に合わせている
+#ifndef CORRECT_COLOR
+#define CORRECT_COLOR 0xFF0000
+#endif
+#ifndef INCORRECT_COLOR
+#define INCORRECT_COLOR 0x0050FF
 #endif
 
 // 子機の回答ランプの色 (0xRRGGBB)
@@ -97,9 +106,9 @@
 // ---------------------------------------------------------------------------
 //  ランプ (WS2812B) の LED 数
 // ---------------------------------------------------------------------------
-// 親機: 緑ランプ → 赤ランプ の順に 1 本のデータ線でつなぐ
-#ifndef MASTER_LEDS_PER_LAMP
-#define MASTER_LEDS_PER_LAMP 7
+// 親機: 中央のランプ 1 個
+#ifndef MASTER_LAMP_LEDS
+#define MASTER_LAMP_LEDS 7
 #endif
 
 #ifndef CHILD_LAMP_LEDS

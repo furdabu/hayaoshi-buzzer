@@ -338,11 +338,11 @@ void renderLamp(uint32_t nowMs) {
     const uint32_t e = nowMs - g_fxStartMs;
     switch (g_fx) {
       case Fx::Correct:
-        if (e < 1200) color = blink(e, kGreen, 150);
+        if (e < 1200) color = blink(e, CORRECT_COLOR, 150);
         else g_fx = Fx::None;
         break;
       case Fx::Incorrect:
-        if (e < 1200) color = blink(e, kRed, 150);
+        if (e < 1200) color = blink(e, INCORRECT_COLOR, 150);
         else g_fx = Fx::None;
         break;
       case Fx::Registered:
@@ -377,7 +377,6 @@ void renderLamp(uint32_t nowMs) {
   g_lamp.fill(color);
   g_lamp.show();
 
-  // ボタン内蔵 LED: 押せるとき / 回答権があるときに点灯
   // ボタン内蔵 LED: 「今押せる」ときだけ点灯
   //   点灯: 受付中でまだこのラウンドで押していない / 番号登録モードで未登録
   //   消灯: 他の人が回答中・自分が回答中・このラウンドで押した後・親機につながっていない
