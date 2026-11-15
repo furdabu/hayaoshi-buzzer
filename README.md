@@ -14,7 +14,7 @@ ESP32 で作る **ワイヤレス早押しクイズボタン** です。
   電池残量も表示します
 - **ボタンが光って状態を知らせる**: 子機は今押せるときだけ、親機は判定待ちのときにボタンが光ります
 - **公平な判定**: 電波が届いた順ではなく「ボタンを押した瞬間の時刻」で判定 ([仕組み](docs/protocol.md))
-- **汎用部品だけ**: ESP32 開発ボード / 60mm アーケードボタン / WS2812B LED リング / DFPlayer Mini / TM1637 4 桁表示
+- **汎用部品だけ**: ESP32 開発ボード / 60mm アーケードボタン / WS2812B LED / 乳白の半球カバー / DFPlayer Mini / TM1637 4 桁表示
 - **3D プリント用データつき**: STL (そのまま印刷) と STEP (CAD で編集)、寸法を変えられる Python スクリプト
 - **効果音つき**: 正解「ピンポーン」・不正解「ブッブー」・回答権「ピコーン」を同梱 (自作音源なので自由に使えます)
 - **子機ごとの設定は不要**: 全子機に同じファームウェアを書き込むだけ。番号は親機が自動で割り振ります
@@ -41,8 +41,8 @@ ESP32 で作る **ワイヤレス早押しクイズボタン** です。
 | | 4 秒ごとに赤く短く光る | 電池残量わずか (充電してください) |
 | 子機のボタン | 光っている | **今押せる** (受付中で、このラウンドではまだ押していない) |
 | | 消えている | 押せない (ほかの人や自分が回答中・このラウンドで押した後・親機につながっていない) |
-| 親機ランプ | 緑 | 正解 (3 秒間) |
-| | 赤 | 不正解 (3 秒間) |
+| 親機ランプ | 緑 | 正解 (5 秒間) |
+| | 赤 | 不正解 (5 秒間) |
 | | 4 秒ごとに赤ランプが短く光る | 親機の電池残量わずか |
 | 親機の正解・不正解ボタン | 光っている | **判定待ち** (回答者が決まった。どちらかを押してください) |
 | | 点滅 | 番号登録モード中 (押すと終了) |
@@ -60,7 +60,7 @@ ESP32 で作る **ワイヤレス早押しクイズボタン** です。
 | --- | --- | --- |
 | マイコン | ESP32-C3 SuperMini | ESP32 開発ボード (ESP32-DevKitC など) |
 | ボタン | 60mm 押しボタン (12V LED 付き) x1 | 同じボタン x2 (緑・赤) |
-| ランプ | WS2812B 16 連 LED リング x1 | WS2812B 16 連 LED リング x2 |
+| ランプ | WS2812B 7 連 LED 丸型基板 + 半球カバー (直径 68mm) x1 | 同じもの x2 (緑・赤) |
 | 音 | — | DFPlayer Mini + microSD + スピーカー |
 | 表示 | — | TM1637 4 桁 7 セグモジュール (0.36 インチ) |
 | 電源 | 18650 x1 + TP4056 Type-C 充電モジュール + MT3608 昇圧モジュール + 電源ボタン | 18650 **x3** (並列) + 子機と同じ構成 |
@@ -125,11 +125,11 @@ pio run -e child -t upload      # 子機 (ESP32-C3 SuperMini)
 | `WIFI_CHANNEL` | 1 | 無線のチャンネル。親機と子機で同じにする |
 | `GROUP_ID` | 1 | 同じ部屋で 2 セット以上使うときにセットごとに変える |
 | `MAX_CHILDREN` | 64 | 子機の最大台数 |
-| `JUDGE_LAMP_MS` | 3000 | 判定ランプの点灯時間。0 なら次の早押しまで点灯 |
+| `JUDGE_LAMP_MS` | 5000 | 判定ランプの点灯時間。0 なら次の早押しまで点灯 |
 | `WINNER_COLOR` | `0xFF7800` | 子機の回答ランプの色 |
-| `LAMP_BRIGHTNESS` | 160 | ランプの明るさ (0〜255) |
+| `LAMP_BRIGHTNESS` | 255 | ランプの明るさ (0〜255) |
 | `AUDIO_VOLUME` | 24 | 音量 (0〜30) |
-| `MASTER_LEDS_PER_LAMP` / `CHILD_LAMP_LEDS` | 16 | LED リングの LED 数 |
+| `MASTER_LEDS_PER_LAMP` / `CHILD_LAMP_LEDS` | 7 | ランプの LED 数 (7 連基板) |
 | `BATTERY_LOW_MV` | 3450 | これより低いと「残量わずか」(mV) |
 | `BATTERY_DIVIDER` | 2.0 | 電池電圧の分圧比。表示がずれるときに微調整 |
 | `ARBITRATION_WINDOW_MS` | 50 | 最初の押下から判定までの待ち時間 |
@@ -183,5 +183,5 @@ python sounds/generate_sounds.py
 A wireless quiz buzzer system built on ESP32 and ESP-NOW. One master unit supports up to 64 buzzer units, with no Wi-Fi router needed.
 Only the first buzzer pressed lights up. Others are locked out until the host presses *correct* or *incorrect* on the master, which plays a sound, lights the green or red lamp, and resets the round.
 Fairness is based on press timestamps synchronised to the master clock, not on radio arrival order.
-Uses generic parts (ESP32 dev board, 60 mm arcade buttons, WS2812B rings, DFPlayer Mini, TM1637 4-digit display) and includes 3D-printable enclosures (STL/STEP plus a parametric build123d script).
+Uses generic parts (ESP32 dev board, 60 mm arcade buttons, WS2812B 7-LED boards under 68 mm diffuser covers, DFPlayer Mini, TM1637 4-digit display) and includes 3D-printable enclosures (STL/STEP plus a parametric build123d script).
 Both units run on rechargeable 18650 cells (1 in each buzzer, 3 in parallel in the master) with USB Type-C charging (TP4056), an MT3608 boost converter, a latching power button and battery-level indication.

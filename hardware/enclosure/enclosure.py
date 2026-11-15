@@ -4,7 +4,7 @@
     python enclosure.py            # ../stl と ../step に全パーツを出力
 
 寸法は下の Params を書き換えると全パーツに反映されます。
-手持ちのボタンや LED リングに合わせて、まず BUTTON_HOLE_D と RING_OD を確認してください。
+手持ちのボタンや半球カバーに合わせて、まず button_hole_d と cover_od を確認してください。
 
 座標系: X = 左右, Y = 奥行き (マイナス側 = 手前 / 操作する人の側), Z = 高さ
 """
@@ -54,22 +54,20 @@ class Params:
     # 3D プリントの穴は少し小さく仕上がるので 0.5mm 大きくしている。別のボタンを使うときは実物を測って合わせる。
     button_hole_d: float = 24.0
 
-    # ---- ランプ (WS2812B リング + 半透明ドーム) ----
-    ring_od: float = 44.0  # LED リングの外径 (16 連は 44mm 前後, 12 連は 37mm 前後)
-    ring_t: float = 1.8  # LED リング基板を収めるくぼみの深さ
-    dome_od: float = 70.0  # ドームの外径
-    dome_wall: float = 1.6  # ドームの厚さ (白/半透明の PLA・PETG で印刷すると光が拡散する)
-    dome_cyl_h: float = 26.0  # ドームの円筒部の高さ
-    dome_top_d: float = 24.0  # ドーム頂部の平らな部分の直径 (斜面は 45° でサポート不要)
-    collar_h: float = 12.0  # 天板から立ち上がるドーム受けの高さ
-    fit: float = 0.2  # はめあいのすき間 (片側)
-    nub: float = 0.6  # ドームの爪の出っ張り
+    # ---- ランプ (中央に WS2812B 7 連丸型基板 + 乳白の半球カバー) ----
+    cover_od: float = 68.0  # 半球カバーのふちの外径 (購入品は 68mm。届いたら測って合わせる)
+    socket_h: float = 6.0  # カバーのふちを差し込む受けの高さ
+    socket_wall: float = 2.0  # 受けの壁の厚さ
+    fit: float = 0.3  # カバーと受けのすき間 (片側)。ゆるければ小さく、入らなければ大きく
+    led_board_d: float = 23.0  # WS2812B 7 連丸型基板の直径
+    led_board_t: float = 1.6  # 基板の厚さ (くぼみの深さ)
+    pedestal_h: float = 4.0  # 基板を載せる台の高さ (LED がカバーの中心付近にくるように)
+    # 半球カバーの代わりに 3D プリントするドーム (購入品と同じ外径で、同じ受けに入る)
+    dome_wall: float = 1.6  # 白/半透明の PLA・PETG で印刷すると光が拡散する
+    dome_cyl_h: float = 16.0  # 円筒部の高さ
+    dome_top_d: float = 24.0  # 頂部の平らな部分の直径 (斜面は 45° でサポート不要)
 
-    # ---- ケーブル (USB 給電版) ----
-    usb_slot_w: float = 13.0
-    usb_slot_h: float = 8.0
-
-    # ---- バッテリー版 ----
+    # ---- 電源 (電池・充電・電源ボタン) ----
     # 18650 電池ボックス (1 本用) を挟むレール
     cell_holder_w: float = 21.0  # 電池ボックスの幅
     cell_rail_len: float = 60.0
@@ -96,7 +94,7 @@ class Params:
 CHILD_SIZE = (110.0, 180.0, 60.0)
 CHILD_BUTTON = (0.0, -42.0)
 CHILD_LAMP = (0.0, 45.0)
-# バッテリー版の配置 (電池は左の壁沿い, 充電口と電源ボタンは背面)
+# 電源まわりの配置 (電池は左の壁沿い, 充電口と電源ボタンは背面)
 CHILD_CELLS = dict(center=(-39.5, -10.0), count=1, axis="y")
 CHILD_CHARGER_X = -22.0  # 背面の壁での充電口の位置
 CHILD_POWER_X = 24.0  # 背面の壁での電源ボタンの位置
@@ -107,7 +105,7 @@ MASTER_BUTTONS = [(-50.0, -38.0), (50.0, -38.0)]  # 左: 正解(緑) / 右: 不�
 MASTER_LAMPS = [(-50.0, 38.0), (50.0, 38.0)]  # 左: 緑ランプ / 右: 赤ランプ
 DISPLAY_WINDOW = (31.0, 15.0)  # TM1637 0.36 インチ 4 桁表示の窓
 SPEAKER_SLOTS = (7, 2.6, 30.0, 5.2)  # 本数, 幅, 高さ, 間隔
-# バッテリー版の配置 (電池は左奥に最大 3 本を並列, 充電口と電源ボタンは右の壁)
+# 電源まわりの配置 (電池は左奥に 3 本を並列, 充電口と電源ボタンは右の壁)
 # 電池は左のボタンの真下を避け、スピーカーにも当たらない位置にしている
 MASTER_CELLS = dict(center=(-55.0, 17.6), count=3, axis="x")
 MASTER_CHARGER_Y = -10.0  # 右の壁での充電口の位置
@@ -154,42 +152,31 @@ def wall_cutout_y(x: float, wall_y: float, z: float, w: float, h: float, p: Para
     return Pos(x, wall_y, z) * Box(w, p.wall * 4, h)
 
 
-def wall_cutout_x(wall_x: float, y: float, z: float, w: float, h: float, p: Params) -> Part:
-    """左右の壁 (X 方向に垂直な壁) の四角い穴"""
-    return Pos(wall_x, y, z) * Box(p.wall * 4, w, h)
-
-
-def lamp_collar(p: Params) -> Part:
-    """天板の上に立つドーム受け。上面のくぼみに LED リングを置き、配線は中央の穴から箱の中へ。"""
-    od = p.dome_od - 2 * p.dome_wall - 2 * p.fit
-    h = p.collar_h
-    collar = Cylinder(od / 2, h, align=MIN)
-    # 上端の外周を面取りしてドームの爪が乗り越えやすくする
-    top_edge = collar.edges().sort_by(Axis.Z)[-1]
-    from build123d import chamfer
-
-    collar = chamfer(top_edge, length=1.0)
-
-    # ドームの爪が入る溝
-    groove_z, groove_h, groove_depth = 1.2, 2.2, p.nub + 0.3
-    groove = Pos(0, 0, groove_z) * (
-        Cylinder(od / 2 + 1, groove_h, align=MIN) - Cylinder(od / 2 - groove_depth, groove_h, align=MIN)
+def lamp_seat(p: Params) -> Part:
+    """天板の上のランプ部分: 半球カバーのふちを差し込む丸い受けと、中央の LED 基板の台。"""
+    r_in = p.cover_od / 2 + p.fit
+    socket = Cylinder(r_in + p.socket_wall, p.socket_h, align=MIN) - Pos(0, 0, -1) * Cylinder(
+        r_in, p.socket_h + 2, align=MIN
     )
-    collar -= groove
+    # 受けの内側の上端を面取りしてカバーを差し込みやすくする
+    socket -= Pos(0, 0, p.socket_h - 1.0) * Cone(r_in, r_in + 1.0, 1.01, align=MIN)
 
-    # LED リングのくぼみ
-    collar -= Pos(0, 0, h - p.ring_t) * Cylinder(p.ring_od / 2 + 0.3, p.ring_t + 1, align=MIN)
-    return collar
+    # LED 基板の台 (上面のくぼみに基板を置く)
+    pedestal = Cylinder(p.led_board_d / 2 + 3.0, p.pedestal_h, align=MIN)
+    pedestal -= Pos(0, 0, p.pedestal_h - p.led_board_t) * Cylinder(
+        p.led_board_d / 2 + 0.3, p.led_board_t + 1, align=MIN
+    )
+    return socket + pedestal
 
 
 def lamp_hole(p: Params, height: float) -> Part:
-    """天板とドーム受けを貫通する配線穴。LED リングは 3 本のリブで下から支える。"""
-    r_hole = p.ring_od / 2 - 0.5
+    """天板と台を貫通する配線穴。LED 基板は 3 本のリブで下から支える。"""
+    r_hole = p.led_board_d / 2 - 0.5
     hole = Pos(0, 0, -1) * Cylinder(r_hole, height + 2, align=MIN)
-    rib_len = 3.0
+    rib_len = 2.5
     for angle in (90, 210, 330):
         rib = Rot(0, 0, angle) * Pos(r_hole - rib_len / 2 + 0.5, 0, -1) * Box(
-            rib_len + 1.0, 4.0, height - p.ring_t + 1, align=MIN
+            rib_len + 1.0, 3.0, height - p.led_board_t + 1, align=MIN
         )
         hole -= rib
     return hole
@@ -215,14 +202,15 @@ def top_plate(
         plate -= Pos(x, y, -1) * Cylinder(p.button_hole_d / 2, t + 2, align=MIN)
 
     for x, y in lamps:
-        plate += Pos(x, y, t) * lamp_collar(p)
-        plate -= Pos(x, y, 0) * lamp_hole(p, t + p.collar_h)
+        plate += Pos(x, y, t) * lamp_seat(p)
+        plate -= Pos(x, y, 0) * lamp_hole(p, t + p.pedestal_h)
     return plate
 
 
 def lamp_dome(p: Params) -> Part:
-    """半透明ドーム。開口部を下にしてそのまま印刷できる (サポート不要)。"""
-    r = p.dome_od / 2
+    """半球カバーの代わりに 3D プリントするドーム (任意)。購入品と同じ外径なので同じ受けに入る。
+    開口部を下にしてそのまま印刷できる (サポート不要)。"""
+    r = p.cover_od / 2
     top_r = p.dome_top_d / 2
     cone_h = r - top_r  # 45°
     solid = Cylinder(r, p.dome_cyl_h, align=MIN) + Pos(0, 0, p.dome_cyl_h) * Cone(
@@ -230,21 +218,11 @@ def lamp_dome(p: Params) -> Part:
     )
     solid = solid.clean()
     bottom = solid.faces().sort_by(Axis.Z)[0]
-    dome = offset(solid, amount=-p.dome_wall, openings=bottom)
-
-    # ドーム受けの溝に引っかかる爪 x3
-    nub_w, nub_z0, nub_h = 8.0, 1.5, 1.5
-    r_in = r - p.dome_wall
-    for angle in (30, 150, 270):
-        nub = Rot(0, 0, angle) * Pos(r_in - p.nub / 2 + 0.2, 0, nub_z0) * Box(
-            p.nub + 0.4, nub_w, nub_h, align=MIN
-        )
-        dome += nub
-    return dome
+    return offset(solid, amount=-p.dome_wall, openings=bottom)
 
 
 # ---------------------------------------------------------------------------
-#  バッテリー版の部品
+#  電源まわりの部品
 #  局所座標: 壁の内側の面が y = 0、箱の内側が y < 0、床の上面が z = 0
 #  place_on_wall() で実際の壁の位置・向きに移す
 # ---------------------------------------------------------------------------
@@ -328,25 +306,19 @@ def battery_features(
 # ---------------------------------------------------------------------------
 #  組み合わせ
 # ---------------------------------------------------------------------------
-def child_base(p: Params, battery: bool = True) -> Part:
-    w, d, h = CHILD_SIZE
+def child_base(p: Params) -> Part:
     body = base_box(CHILD_SIZE, p)
-    if battery:
-        # 背面: Type-C 充電口と電源ボタン / 左の壁沿い: 電池
-        body = battery_features(
-            body, CHILD_SIZE, CHILD_CELLS, "+y", CHILD_CHARGER_X, "+y", CHILD_POWER_X, p
-        )
-    else:
-        # 背面: USB ケーブルの穴
-        body -= wall_cutout_y(0, d / 2 - p.wall / 2, p.floor + 10, p.usb_slot_w, p.usb_slot_h, p)
-    return body
+    # 背面: Type-C 充電口と電源ボタン / 左の壁沿い: 電池
+    return battery_features(
+        body, CHILD_SIZE, CHILD_CELLS, "+y", CHILD_CHARGER_X, "+y", CHILD_POWER_X, p
+    )
 
 
 def child_top(p: Params) -> Part:
     return top_plate(CHILD_SIZE, [CHILD_BUTTON], [CHILD_LAMP], p)
 
 
-def master_base(p: Params, battery: bool = True) -> Part:
+def master_base(p: Params) -> Part:
     w, d, h = MASTER_SIZE
     body = base_box(MASTER_SIZE, p)
     # 手前の壁: 4 桁表示の窓 (司会者から見える)
@@ -357,15 +329,10 @@ def master_base(p: Params, battery: bool = True) -> Part:
     for i in range(n):
         x = (i - (n - 1) / 2) * pitch
         body -= wall_cutout_y(x, d / 2 - p.wall / 2, h / 2, sw, sh, p)
-    if battery:
-        # 右の壁: Type-C 充電口と電源ボタン / 左奥: 電池 (最大 3 本)
-        body = battery_features(
-            body, MASTER_SIZE, MASTER_CELLS, "+x", MASTER_CHARGER_Y, "+x", MASTER_POWER_Y, p
-        )
-    else:
-        # 右の壁: USB ケーブルの穴
-        body -= wall_cutout_x(w / 2 - p.wall / 2, 0, p.floor + 10, p.usb_slot_w, p.usb_slot_h, p)
-    return body
+    # 右の壁: Type-C 充電口と電源ボタン / 左奥: 電池 3 本
+    return battery_features(
+        body, MASTER_SIZE, MASTER_CELLS, "+x", MASTER_CHARGER_Y, "+x", MASTER_POWER_Y, p
+    )
 
 
 def master_top(p: Params) -> Part:
@@ -374,10 +341,8 @@ def master_top(p: Params) -> Part:
 
 PARTS = {
     "child_base": child_base,
-    "child_base_usb": lambda p: child_base(p, battery=False),
     "child_top": child_top,
     "master_base": master_base,
-    "master_base_usb": lambda p: master_base(p, battery=False),
     "master_top": master_top,
     "lamp_dome": lamp_dome,
 }

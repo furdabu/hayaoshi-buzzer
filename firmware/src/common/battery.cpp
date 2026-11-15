@@ -6,12 +6,9 @@
 #include "config.h"
 
 namespace battery {
-
-#if USE_BATTERY
-
 namespace {
 
-// この範囲外の値は「電池がつながっていない (分圧回路が無い)」とみなす
+// この範囲外の値は「電池の電圧が測れていない (配線の外れなど)」とみなす
 constexpr int kPresentMinMv = 2800;
 constexpr int kPresentMaxMv = 4600;
 constexpr int kHysteresisMv = 100;
@@ -48,17 +45,5 @@ int millivolts() { return present() ? g_mv : 0; }
 int percent() { return present() ? buzzer::batteryPercent(g_mv) : 0; }
 bool low() { return g_low; }
 uint8_t encoded() { return buzzer::encodeBattery20mV(millivolts()); }
-
-#else
-
-void begin() {}
-void update(uint32_t) {}
-bool present() { return false; }
-int millivolts() { return 0; }
-int percent() { return 0; }
-bool low() { return false; }
-uint8_t encoded() { return 0; }
-
-#endif
 
 }  // namespace battery

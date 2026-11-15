@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import matplotlib
@@ -105,6 +106,24 @@ GRAY = (0.78, 0.79, 0.82)
 DOME = (1.0, 0.97, 0.90)
 
 
+def pc_cover(p: enc.Params) -> Part:
+    """プレビュー用の購入品の半球カバー (外径 68mm, 高さ 40mm, 乳白 PC)"""
+    r = p.cover_od / 2
+    h_cyl = 40.0 - r
+    outer = Cylinder(r, h_cyl, align=enc.MIN) + Pos(0, 0, h_cyl) * (Sphere(r) & Box(2 * r, 2 * r, r, align=enc.MIN))
+    inner = Pos(0, 0, -1) * Cylinder(r - 1.5, h_cyl + 1, align=enc.MIN) + Pos(0, 0, h_cyl) * Sphere(r - 1.5)
+    return outer - inner
+
+
+def led_board(p: enc.Params) -> Part:
+    """プレビュー用の WS2812B 7 連丸型基板"""
+    board = Cylinder(p.led_board_d / 2, p.led_board_t, align=enc.MIN)
+    for i in range(7):
+        x, y = (0.0, 0.0) if i == 0 else (8 * math.cos(math.radians(60 * i)), 8 * math.sin(math.radians(60 * i)))
+        board += Pos(x, y, p.led_board_t) * Box(5, 5, 1.6, align=enc.MIN)
+    return board
+
+
 def child_assembly(p: enc.Params):
     w, d, h = enc.CHILD_SIZE
     top_z = h
@@ -116,7 +135,7 @@ def child_assembly(p: enc.Params):
         (Pos(0, 0, top_z) * enc.child_top(p), GRAY, 1.0),
         (rim, (0.15, 0.15, 0.15), 1.0),
         (cap, (0.95, 0.20, 0.15), 1.0),
-        (Pos(lx, ly, top_z + p.plate_t) * enc.lamp_dome(p), (1.0, 0.62, 0.15), 0.85),
+        (Pos(lx, ly, top_z + p.plate_t) * pc_cover(p), (1.0, 0.62, 0.15), 0.85),
     ]
 
 
@@ -133,7 +152,7 @@ def master_assembly(p: enc.Params):
         items += [(rim, (0.15, 0.15, 0.15), 1.0), (cap, c, 1.0)]
     for (lx, ly), c in zip(enc.MASTER_LAMPS, colors):
         tint = tuple(0.55 + 0.45 * v for v in c)
-        items.append((Pos(lx, ly, top_z + p.plate_t) * enc.lamp_dome(p), tint, 0.85))
+        items.append((Pos(lx, ly, top_z + p.plate_t) * pc_cover(p), tint, 0.85))
     return items
 
 
@@ -195,17 +214,15 @@ def master_inside(p: enc.Params):
 def lamp_section(p: enc.Params):
     """ランプ部分の断面 (はめあい確認用)"""
     plate = Box(90, 90, p.plate_t, align=enc.MIN)
-    plate = plate + Pos(0, 0, p.plate_t) * enc.lamp_collar(p)
-    plate -= enc.lamp_hole(p, p.plate_t + p.collar_h)
-    dome = Pos(0, 0, p.plate_t) * enc.lamp_dome(p)
-    ring = Pos(0, 0, p.plate_t + p.collar_h - p.ring_t) * (
-        Cylinder(p.ring_od / 2, 1.6, align=enc.MIN) - Cylinder(p.ring_od / 2 - 6, 2, align=enc.MIN)
-    )
+    plate = plate + Pos(0, 0, p.plate_t) * enc.lamp_seat(p)
+    plate -= enc.lamp_hole(p, p.plate_t + p.pedestal_h)
+    cover = Pos(0, 0, p.plate_t) * pc_cover(p)
+    board = Pos(0, 0, p.plate_t + p.pedestal_h - p.led_board_t) * led_board(p)
     cut = Pos(0, 50, 0) * Box(200, 100, 200)
     return [
         (plate - cut, GRAY, 1.0),
-        (dome - cut, (1.0, 0.62, 0.15), 1.0),
-        (ring - cut, (0.1, 0.35, 0.8), 1.0),
+        (cover - cut, (1.0, 0.62, 0.15), 1.0),
+        (board - cut, (0.1, 0.35, 0.8), 1.0),
     ]
 
 
@@ -215,8 +232,8 @@ def main() -> None:
     render(child_assembly(p), out / "child.png", 24, -62, "Child unit")
     render(master_assembly(p), out / "master.png", 28, -58, "Master unit")
     render(lamp_section(p), out / "lamp_section.png", 12, 90, "Lamp section")
-    render(child_inside(p), out / "child_inside.png", 62, -70, "Child unit - inside (battery)")
-    render(master_inside(p), out / "master_inside.png", 62, -65, "Master unit - inside (battery)")
+    render(child_inside(p), out / "child_inside.png", 62, -70, "Child unit - inside")
+    render(master_inside(p), out / "master_inside.png", 62, -65, "Master unit - inside")
 
 
 if __name__ == "__main__":

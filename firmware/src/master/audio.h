@@ -1,4 +1,4 @@
-// 効果音 (DFPlayer Mini + スピーカー / 圧電ブザー)
+// 効果音 (DFPlayer Mini + スピーカー)
 #pragma once
 
 #include <stdint.h>
@@ -15,7 +15,7 @@ enum class Sound : uint8_t {
 
 void begin();
 void play(Sound sound);
-void update();  // loop() から毎回呼ぶ (ブザーの音階を進める)
+void update();  // loop() から毎回呼ぶ
 bool dfplayerReady();
 
 }  // namespace audio

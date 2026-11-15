@@ -38,7 +38,7 @@
 // 判定ランプ (正解=緑 / 不正解=赤) を点灯しておく時間 (ms)。
 // 0 にすると次に誰かがボタンを押すまで点灯し続ける。
 #ifndef JUDGE_LAMP_MS
-#define JUDGE_LAMP_MS 3000
+#define JUDGE_LAMP_MS 5000
 #endif
 
 // 子機の回答ランプの色 (0xRRGGBB)
@@ -46,9 +46,9 @@
 #define WINNER_COLOR 0xFF7800
 #endif
 
-// ランプ全体の明るさ (0〜255)。USB 給電なら 160 程度まで。
+// ランプ全体の明るさ (0〜255)。7 連基板なら最大 (255) でも 5V で 0.4A 程度
 #ifndef LAMP_BRIGHTNESS
-#define LAMP_BRIGHTNESS 160
+#define LAMP_BRIGHTNESS 255
 #endif
 
 // ボタン内蔵 LED の明るさ (0〜255)。下げると電池が長持ちする
@@ -74,11 +74,6 @@
 // ---------------------------------------------------------------------------
 //  バッテリー (18650 + TP4056 充電モジュール + 昇圧モジュール)
 // ---------------------------------------------------------------------------
-// 電池の電圧を測って残量を表示する。USB 給電だけで作る場合は 0 にする。
-#ifndef USE_BATTERY
-#define USE_BATTERY 1
-#endif
-
 // 電池の電圧を ADC で測るための分圧比 (100kΩ + 100kΩ なら 2.0)
 #ifndef BATTERY_DIVIDER
 #define BATTERY_DIVIDER 2.0f
@@ -94,11 +89,11 @@
 // ---------------------------------------------------------------------------
 // 親機: 緑ランプ → 赤ランプ の順に 1 本のデータ線でつなぐ
 #ifndef MASTER_LEDS_PER_LAMP
-#define MASTER_LEDS_PER_LAMP 16
+#define MASTER_LEDS_PER_LAMP 7
 #endif
 
 #ifndef CHILD_LAMP_LEDS
-#define CHILD_LAMP_LEDS 16
+#define CHILD_LAMP_LEDS 7
 #endif
 
 // ---------------------------------------------------------------------------
@@ -126,8 +121,7 @@
 #endif
 
 #else
-// --- ESP32 DevKitC (ESP32-WROOM-32) ---
-// 親機
+// --- 親機: ESP32 DevKitC (ESP32-WROOM-32) ---
 #ifndef PIN_BTN_CORRECT
 #define PIN_BTN_CORRECT 32
 #endif
@@ -146,22 +140,9 @@
 #ifndef PIN_TM_DIO
 #define PIN_TM_DIO 19
 #endif
-#ifndef PIN_BUZZER
-#define PIN_BUZZER 25  // 任意: 圧電ブザー (DFPlayer が無くても音が出る)。使わないなら -1
-#endif
 #ifndef PIN_JUDGE_LED
 #define PIN_JUDGE_LED 26  // 正解・不正解ボタンの内蔵 LED (12V, 2 個まとめてトランジスタ経由)。使わないなら -1
 #endif
-
-// 子機
-#ifndef PIN_BUTTON
-#define PIN_BUTTON 32
-#endif
-#ifndef PIN_BUTTON_LED
-#define PIN_BUTTON_LED 26  // ボタン内蔵 LED (12V, トランジスタ経由)。使わないなら -1
-#endif
-
-// 共通
 #ifndef PIN_LAMP
 #define PIN_LAMP 27
 #endif
