@@ -2,6 +2,8 @@
 
     pip install build123d matplotlib
     python render_preview.py
+
+小さなソフトウェアレンダラー (奥行きバッファ + なめらかな陰影 + 輪郭線 + アンチエイリアス) で描画する。
 """
 
 from __future__ import annotations
@@ -12,85 +14,128 @@ from pathlib import Path
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.image as mpimg  # noqa: E402
 import numpy as np  # noqa: E402
 from build123d import Axis, Box, Cylinder, Part, Pos, Rot, Sphere, fillet  # noqa: E402
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection  # noqa: E402
 
 import enclosure as enc  # noqa: E402
 
-LIGHT = np.array([0.35, -0.55, 0.75])
-LIGHT = LIGHT / np.linalg.norm(LIGHT)
+WIDTH, HEIGHT = 1000, 750  # 出力画像の大きさ (px)
+SSAA = 3  # この倍率で描いてから縮小してギザギザを消す
+BACKGROUND = np.array([1.0, 1.0, 1.0])
 
 
-def subdivide(tris: np.ndarray, max_edge: float) -> np.ndarray:
-    """matplotlib は三角形単位で奥行きを並べるので、大きな三角形を細かく割って表示崩れを防ぐ"""
-    while True:
-        e = np.stack(
-            [
-                np.linalg.norm(tris[:, 0] - tris[:, 1], axis=1),
-                np.linalg.norm(tris[:, 1] - tris[:, 2], axis=1),
-                np.linalg.norm(tris[:, 2] - tris[:, 0], axis=1),
-            ],
-            axis=1,
-        ).max(axis=1)
-        big = e > max_edge
-        if not big.any():
-            return tris
-        t = tris[big]
-        a, b, c = t[:, 0], t[:, 1], t[:, 2]
-        ab, bc, ca = (a + b) / 2, (b + c) / 2, (c + a) / 2
-        split = np.concatenate(
-            [
-                np.stack([a, ab, ca], 1),
-                np.stack([ab, b, bc], 1),
-                np.stack([ca, bc, c], 1),
-                np.stack([ab, bc, ca], 1),
-            ]
-        )
-        tris = np.concatenate([tris[~big], split])
-
-
-def triangles(part: Part, tol: float = 0.15) -> np.ndarray:
-    verts, tris = part.tessellate(tol, 0.25)
+def mesh(part: Part) -> tuple[np.ndarray, np.ndarray]:
+    """三角形 (n,3,3) と、各頂点のなめらかな法線 (n,3,3) を返す。
+    同じ面の中では法線を平均して丸みをなめらかに、面と面の境目は角をはっきり残す。"""
+    verts, tris = part.tessellate(0.05, 0.15)
     v = np.array([[p.X, p.Y, p.Z] for p in verts])
-    return subdivide(v[np.array(tris)], 6.0)
+    t = np.array(tris)
+    fn = np.cross(v[t[:, 1]] - v[t[:, 0]], v[t[:, 2]] - v[t[:, 0]])
+    vn = np.zeros_like(v)
+    for k in range(3):
+        np.add.at(vn, t[:, k], fn)
+    vn /= np.linalg.norm(vn, axis=1, keepdims=True) + 1e-12
+    return v[t], vn[t]
 
 
-def shaded(tris: np.ndarray, rgb: tuple[float, float, float], alpha: float) -> np.ndarray:
-    n = np.cross(tris[:, 1] - tris[:, 0], tris[:, 2] - tris[:, 0])
-    n /= np.linalg.norm(n, axis=1, keepdims=True) + 1e-12
-    shade = 0.38 + 0.62 * np.clip(n @ LIGHT, 0, 1)
-    rgba = np.empty((len(tris), 4))
-    rgba[:, :3] = np.array(rgb)[None, :] * shade[:, None]
-    rgba[:, 3] = alpha
-    return rgba
+def camera(elev: float, azim: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    e, a = math.radians(elev), math.radians(azim)
+    to_cam = np.array([math.cos(e) * math.cos(a), math.cos(e) * math.sin(a), math.sin(e)])
+    right = np.cross(-to_cam, [0.0, 0.0, 1.0])
+    right /= np.linalg.norm(right)
+    up = np.cross(right, -to_cam)
+    return right, up, to_cam
 
 
-def render(items, path: Path, elev: float, azim: float, title: str) -> None:
-    all_tris, all_cols = [], []
-    for part, rgb, alpha in items:
-        t = triangles(part)
-        all_tris.append(t)
-        all_cols.append(shaded(t, rgb, alpha))
-    tris = np.concatenate(all_tris)
-    cols = np.concatenate(all_cols)
+def render(items, path: Path, elev: float, azim: float, title: str = "") -> None:
+    right, up, to_cam = camera(elev, azim)
+    light_key = 0.55 * up - 0.45 * right + 0.70 * to_cam
+    light_key /= np.linalg.norm(light_key)
+    light_fill = -0.2 * up + 0.6 * right + 0.5 * to_cam
+    light_fill /= np.linalg.norm(light_fill)
 
-    fig = plt.figure(figsize=(8, 6), dpi=110)
-    ax = fig.add_subplot(projection="3d")
-    ax.add_collection3d(Poly3DCollection(tris, facecolors=cols, edgecolors="none"))
-    lo, hi = tris.reshape(-1, 3).min(0), tris.reshape(-1, 3).max(0)
-    ax.set_xlim(lo[0], hi[0])
-    ax.set_ylim(lo[1], hi[1])
-    ax.set_zlim(lo[2], hi[2])
-    ax.set_box_aspect(hi - lo)
-    ax.view_init(elev=elev, azim=azim)
-    ax.set_axis_off()
-    ax.set_title(title)
-    fig.tight_layout()
+    meshes = []
+    for obj_id, (part, rgb, _alpha) in enumerate(items, start=1):
+        tri, nrm = mesh(part)
+        meshes.append((obj_id, np.array(rgb, dtype=float), tri, nrm))
+
+    # 画面座標へ (正射影)。全体が画像に収まるように拡大率を決める
+    all_pts = np.concatenate([m[2].reshape(-1, 3) for m in meshes])
+    sx, sy = all_pts @ right, all_pts @ up
+    W, H = WIDTH * SSAA, HEIGHT * SSAA
+    margin = 0.06
+    scale = min(W * (1 - 2 * margin) / (sx.max() - sx.min()), H * (1 - 2 * margin) / (sy.max() - sy.min()))
+    cx, cy = (sx.max() + sx.min()) / 2, (sy.max() + sy.min()) / 2
+
+    zbuf = np.full((H, W), -np.inf)
+    color = np.tile(BACKGROUND, (H, W, 1))
+    normal = np.zeros((H, W, 3))
+    ids = np.zeros((H, W), dtype=np.int32)
+
+    for obj_id, rgb, tri, nrm in meshes:
+        px = (tri @ right - cx) * scale + W / 2
+        py = H / 2 - (tri @ up - cy) * scale
+        pz = tri @ to_cam
+        for i in range(len(tri)):
+            x0, x1, x2 = px[i]
+            y0, y1, y2 = py[i]
+            xmin, xmax = int(max(math.floor(min(x0, x1, x2)), 0)), int(min(math.ceil(max(x0, x1, x2)), W - 1))
+            ymin, ymax = int(max(math.floor(min(y0, y1, y2)), 0)), int(min(math.ceil(max(y0, y1, y2)), H - 1))
+            if xmin > xmax or ymin > ymax:
+                continue
+            area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0)
+            if abs(area) < 1e-9:
+                continue
+            gx, gy = np.meshgrid(np.arange(xmin, xmax + 1) + 0.5, np.arange(ymin, ymax + 1) + 0.5)
+            w0 = ((x1 - gx) * (y2 - gy) - (x2 - gx) * (y1 - gy)) / area
+            w1 = ((x2 - gx) * (y0 - gy) - (x0 - gx) * (y2 - gy)) / area
+            w2 = 1.0 - w0 - w1
+            inside = (w0 >= -1e-6) & (w1 >= -1e-6) & (w2 >= -1e-6)
+            if not inside.any():
+                continue
+            z = w0 * pz[i, 0] + w1 * pz[i, 1] + w2 * pz[i, 2]
+            zslice = zbuf[ymin : ymax + 1, xmin : xmax + 1]
+            win = inside & (z > zslice)
+            if not win.any():
+                continue
+            zslice[win] = z[win]
+            n = w0[..., None] * nrm[i, 0] + w1[..., None] * nrm[i, 1] + w2[..., None] * nrm[i, 2]
+            n /= np.linalg.norm(n, axis=-1, keepdims=True) + 1e-12
+            # 裏から見えている面は法線を反転 (断面図などで内側が見えるとき)
+            facing = n @ to_cam
+            n[facing < 0] *= -1
+            nslice = normal[ymin : ymax + 1, xmin : xmax + 1]
+            nslice[win] = n[win]
+            ids[ymin : ymax + 1, xmin : xmax + 1][win] = obj_id
+            color[ymin : ymax + 1, xmin : xmax + 1][win] = rgb
+
+    # 陰影 (環境光 + 主光源 + 補助光 + ハイライト)
+    hit = ids > 0
+    n = normal[hit]
+    diffuse = 0.42 + 0.50 * np.clip(n @ light_key, 0, 1) + 0.15 * np.clip(n @ light_fill, 0, 1)
+    half = light_key + to_cam
+    half /= np.linalg.norm(half)
+    spec = 0.18 * np.clip(n @ half, 0, 1) ** 40
+    color[hit] = np.clip(color[hit] * diffuse[:, None] + spec[:, None], 0, 1)
+
+    # 輪郭線: 部品の境目・奥行きの段差・面の向きが大きく変わるところ
+    edge = np.zeros((H, W), dtype=bool)
+    depth = np.where(hit, zbuf, -1e6)
+    for dy, dx in ((0, 1), (1, 0)):
+        a_id, b_id = ids[: H - dy, : W - dx], ids[dy:, dx:]
+        a_z, b_z = depth[: H - dy, : W - dx], depth[dy:, dx:]
+        a_n, b_n = normal[: H - dy, : W - dx], normal[dy:, dx:]
+        e = (a_id != b_id) | (np.abs(a_z - b_z) > 1.5) | (np.sum(a_n * b_n, axis=-1) < 0.85)
+        e &= (a_id > 0) | (b_id > 0)
+        edge[: H - dy, : W - dx] |= e
+        edge[dy:, dx:] |= e
+    color[edge] *= 0.45
+
+    # 縮小してアンチエイリアス
+    img = color.reshape(HEIGHT, SSAA, WIDTH, SSAA, 3).mean(axis=(1, 3))
     path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(path, facecolor="white")
-    plt.close(fig)
+    mpimg.imsave(path, img)
     print("wrote", path)
 
 
