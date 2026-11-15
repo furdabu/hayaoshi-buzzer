@@ -14,7 +14,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
-from build123d import Box, Cylinder, Part, Pos, Rot, Sphere  # noqa: E402
+from build123d import Axis, Box, Cylinder, Part, Pos, Rot, Sphere, fillet  # noqa: E402
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection  # noqa: E402
 
 import enclosure as enc  # noqa: E402
@@ -94,11 +94,12 @@ def render(items, path: Path, elev: float, azim: float, title: str) -> None:
     print("wrote", path)
 
 
-def arcade_button(x: float, y: float, z: float, rgb_part_only: bool = False) -> Part:
-    """プレビュー用の 60mm ボタン (形だけ)"""
-    rim = Pos(x, y, z) * Cylinder(32, 6, align=enc.MIN)
-    cap = Pos(x, y, z + 6) * (Sphere(27) & Pos(0, 0, 13.5) * Box(60, 60, 27))
-    return rim, cap
+def arcade_button(x: float, y: float, z: float) -> tuple[Part, Part]:
+    """プレビュー用の 60mm ボタン (形だけ)。採用品は天板から少しだけ出る、薄くて平らな形"""
+    rim = Pos(x, y, z) * Cylinder(32, 3, align=enc.MIN)  # 黒い縁
+    cap = Cylinder(28.5, 4, align=enc.MIN)  # 色のついた平らなボタン面
+    cap = fillet(cap.edges().sort_by(Axis.Z)[-1], radius=1.5)
+    return rim, Pos(x, y, z + 3) * cap
 
 
 GRAY_DARK = (0.30, 0.32, 0.36)
