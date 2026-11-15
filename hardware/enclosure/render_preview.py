@@ -13,7 +13,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
-from build123d import Box, Cylinder, Part, Pos, Sphere  # noqa: E402
+from build123d import Box, Cylinder, Part, Pos, Rot, Sphere  # noqa: E402
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection  # noqa: E402
 
 import enclosure as enc  # noqa: E402
@@ -137,6 +137,61 @@ def master_assembly(p: enc.Params):
     return items
 
 
+def box_at(x: float, y: float, z: float, sx: float, sy: float, sz: float) -> Part:
+    return Pos(x, y, z) * Box(sx, sy, sz, align=enc.MIN)
+
+
+BATTERY = (0.20, 0.45, 0.85)
+BOARD = (0.10, 0.55, 0.30)
+BOOST = (0.85, 0.35, 0.15)
+METAL = (0.70, 0.70, 0.72)
+BUTTON_BODY = (0.60, 0.20, 0.20)
+
+
+def child_inside(p: enc.Params):
+    """子機の中身の配置例 (天板を外して上から見た図)"""
+    w, d, h = enc.CHILD_SIZE
+    f = p.floor
+    cx, cy = enc.CHILD_CELLS["center"]
+    wall_y = d / 2 - p.wall
+    bx, by = enc.CHILD_BUTTON
+    return [
+        (enc.child_base(p), GRAY_DARK, 1.0),
+        (box_at(cx, cy, f, 20.5, 77, 19), BATTERY, 1.0),  # 18650 電池ボックス
+        (box_at(enc.CHILD_CHARGER_X, wall_y - 14.5, f + p.charger_ledge_h, 17, 28, 1.2), BOARD, 1.0),
+        (Pos(enc.CHILD_POWER_X, wall_y - 14, p.power_button_z) * Rot(90, 0, 0) * Cylinder(9, 28), METAL, 1.0),
+        (box_at(5, 18, f, 17, 36, 6), BOOST, 1.0),  # MT3608 (5V)
+        (box_at(5, 62, f, 17, 36, 6), BOOST, 1.0),  # MT3608 (12V, ボタン LED 用)
+        (box_at(36, 0, f, 18, 23, 6), BOARD, 1.0),  # ESP32-C3 SuperMini
+        (Pos(bx, by, h - 40) * Cylinder(15, 40, align=enc.MIN), BUTTON_BODY, 1.0),  # ボタンの胴体
+    ]
+
+
+def master_inside(p: enc.Params):
+    """親機の中身の配置例 (天板を外して上から見た図)"""
+    w, d, h = enc.MASTER_SIZE
+    f = p.floor
+    cx, cy = enc.MASTER_CELLS["center"]
+    pitch = p.cell_holder_w + 0.6 + p.rail_t
+    wall_x = w / 2 - p.wall
+    items = [(enc.master_base(p), GRAY_DARK, 1.0)]
+    for i in (-1, 0, 1):
+        items.append((box_at(cx, cy + i * pitch, f, 77, 20.5, 19), BATTERY, 1.0))
+    items += [
+        (box_at(wall_x - 14.5, enc.MASTER_CHARGER_Y, f + p.charger_ledge_h, 28, 17, 1.2), BOARD, 1.0),
+        (Pos(wall_x - 14, enc.MASTER_POWER_Y, p.power_button_z) * Rot(0, 90, 0) * Cylinder(9, 28), METAL, 1.0),
+        (box_at(86, -48, f, 28, 55, 10), BOARD, 1.0),  # ESP32
+        (box_at(-88, -50, f, 21, 21, 8), BOARD, 1.0),  # DFPlayer
+        (box_at(5, -30, f, 36, 17, 6), BOOST, 1.0),  # MT3608 (5V)
+        (box_at(5, -55, f, 36, 17, 6), BOOST, 1.0),  # MT3608 (12V, ボタン LED 用)
+        (Pos(0, d / 2 - p.wall - 8, h / 2) * Rot(90, 0, 0) * Cylinder(20, 16), METAL, 1.0),  # スピーカー
+        (box_at(0, -d / 2 + p.wall + 4, h / 2 - 12, 42, 8, 24), BOARD, 1.0),  # 4 桁表示
+    ]
+    for bx, by in enc.MASTER_BUTTONS:
+        items.append((Pos(bx, by, h - 40) * Cylinder(15, 40, align=enc.MIN), BUTTON_BODY, 1.0))
+    return items
+
+
 def lamp_section(p: enc.Params):
     """ランプ部分の断面 (はめあい確認用)"""
     plate = Box(90, 90, p.plate_t, align=enc.MIN)
@@ -160,6 +215,8 @@ def main() -> None:
     render(child_assembly(p), out / "child.png", 24, -62, "Child unit")
     render(master_assembly(p), out / "master.png", 28, -58, "Master unit")
     render(lamp_section(p), out / "lamp_section.png", 12, 90, "Lamp section")
+    render(child_inside(p), out / "child_inside.png", 62, -70, "Child unit - inside (battery)")
+    render(master_inside(p), out / "master_inside.png", 62, -65, "Master unit - inside (battery)")
 
 
 if __name__ == "__main__":

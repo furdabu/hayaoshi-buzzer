@@ -76,8 +76,8 @@ struct __attribute__((packed)) HelloPacket {
   Header h;
   uint8_t fwMajor;
   uint8_t fwMinor;
-  uint8_t knownId;  // 子機が覚えている自分の番号 (0 = 未割り当て)
-  uint8_t reserved;
+  uint8_t knownId;      // 子機が覚えている自分の番号 (0 = 未割り当て)
+  uint8_t battery20mV;  // 電池電圧 (20mV 単位, 0 = 電池なし / 不明)
 };
 
 // 親機 -> 全子機。targetMac の子機に番号を伝える。

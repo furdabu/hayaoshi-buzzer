@@ -51,6 +51,12 @@
 #define LAMP_BRIGHTNESS 160
 #endif
 
+// ボタン内蔵 LED の明るさ (0〜255)。下げると電池が長持ちする
+//   子機: 今押せるときに点灯 / 親機: 判定待ち (回答者が決まった) のときに点灯
+#ifndef BUTTON_LED_LEVEL
+#define BUTTON_LED_LEVEL 255
+#endif
+
 // DFPlayer の音量 (0〜30)
 #ifndef AUDIO_VOLUME
 #define AUDIO_VOLUME 24
@@ -63,6 +69,24 @@
 
 #ifndef DISPLAY_BRIGHTNESS
 #define DISPLAY_BRIGHTNESS 5  // 0〜7
+#endif
+
+// ---------------------------------------------------------------------------
+//  バッテリー (18650 + TP4056 充電モジュール + 昇圧モジュール)
+// ---------------------------------------------------------------------------
+// 電池の電圧を測って残量を表示する。USB 給電だけで作る場合は 0 にする。
+#ifndef USE_BATTERY
+#define USE_BATTERY 1
+#endif
+
+// 電池の電圧を ADC で測るための分圧比 (100kΩ + 100kΩ なら 2.0)
+#ifndef BATTERY_DIVIDER
+#define BATTERY_DIVIDER 2.0f
+#endif
+
+// これより低くなったら「電池残量わずか」として知らせる (mV)
+#ifndef BATTERY_LOW_MV
+#define BATTERY_LOW_MV 3450
 #endif
 
 // ---------------------------------------------------------------------------
@@ -89,10 +113,13 @@
 #define PIN_LAMP 4
 #endif
 #ifndef PIN_BUTTON_LED
-#define PIN_BUTTON_LED 5  // 任意: ボタン内蔵 LED (トランジスタ経由)。使わないなら -1
+#define PIN_BUTTON_LED 5  // ボタン内蔵 LED (12V, トランジスタ経由)。使わないなら -1
 #endif
 #ifndef PIN_STATUS_LED
 #define PIN_STATUS_LED 8
+#endif
+#ifndef PIN_BATTERY
+#define PIN_BATTERY 1  // 電池電圧 (分圧) の入力
 #endif
 #ifndef STATUS_LED_ACTIVE_LOW
 #define STATUS_LED_ACTIVE_LOW 1
@@ -122,18 +149,24 @@
 #ifndef PIN_BUZZER
 #define PIN_BUZZER 25  // 任意: 圧電ブザー (DFPlayer が無くても音が出る)。使わないなら -1
 #endif
+#ifndef PIN_JUDGE_LED
+#define PIN_JUDGE_LED 26  // 正解・不正解ボタンの内蔵 LED (12V, 2 個まとめてトランジスタ経由)。使わないなら -1
+#endif
 
 // 子機
 #ifndef PIN_BUTTON
 #define PIN_BUTTON 32
 #endif
 #ifndef PIN_BUTTON_LED
-#define PIN_BUTTON_LED 26  // 任意: ボタン内蔵 LED (トランジスタ経由)。使わないなら -1
+#define PIN_BUTTON_LED 26  // ボタン内蔵 LED (12V, トランジスタ経由)。使わないなら -1
 #endif
 
 // 共通
 #ifndef PIN_LAMP
 #define PIN_LAMP 27
+#endif
+#ifndef PIN_BATTERY
+#define PIN_BATTERY 35  // 電池電圧 (分圧) の入力。ADC1 のピンであること (無線使用中は ADC2 が使えない)
 #endif
 #ifndef PIN_STATUS_LED
 #define PIN_STATUS_LED 2
