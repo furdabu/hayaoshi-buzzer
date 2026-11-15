@@ -13,15 +13,15 @@
 | ---: | --- | ---: | --- | --- | ---: | --- |
 | 1 | ESP32-C3 SuperMini (子機) | 8 | 8 個 | — | 1,304 円 | https://ja.aliexpress.com/item/1005007546253330.html |
 | 2 | ESP32 DevKitC 38 ピン (親機) | 1 | 1 個 | **ESP32-WROOM-32** / 38 ピン / Type-C / CP2102 | 180〜400 円 | https://ja.aliexpress.com/item/1005007059778300.html |
-| 3 | 60mm 押しボタン 5 個入り | 子機 8 + 親機 2 | **Red 60mm x2 + Green 60mm x1** | **60mm** を選ぶ (最初は 46mm) | 6,066 円 | https://ja.aliexpress.com/item/1005004682547368.html |
-| 4 | 半球カバー 10 個入り (乳白, 直径 68mm) | 10 | 1 パック | — | 2,862 円 | https://ja.aliexpress.com/item/1005010438573946.html |
-| 5 | WS2812B 7 連丸型基板 | 10 | 10PCS | 数量 **10PCS** | 2,435 円 | https://ja.aliexpress.com/item/1005013012510968.html |
+| 3 | 60mm 押しボタン 5 個入り | 子機 8 + 親機 2 | **Red 60mm x2 + Blue 60mm x1** | **60mm** を選ぶ (最初は 46mm) | 6,130 円 | https://ja.aliexpress.com/item/1005004682547368.html |
+| 4 | 半球カバー 10 個入り (乳白, 直径 68mm) | 9 | 1 パック | — | 2,862 円 | https://ja.aliexpress.com/item/1005010438573946.html |
+| 5 | WS2812B 7 連丸型基板 | 9 | 10PCS | 数量 **10PCS** | 2,435 円 | https://ja.aliexpress.com/item/1005013012510968.html |
 | 6 | 18650 電池 (Molicel P30B 3,000mAh) | 11 | 11 本 | 本数 | 10,164 円 | https://ja.aliexpress.com/item/1005006816240419.html |
 | 7 | 18650 電池ボックス (並列) | 子機 8 / 親機 1 | 1 本用 x8 + 3 本用 x1 | **1x18650 Paralle 3.7V** / **3x18650 Paralle 3.7V** | 2,321 円 | https://ja.aliexpress.com/item/1005005449039449.html |
 | 8 | TP4056 Type-C 充電モジュール (保護回路付き) | 9 | 10 個入り x1 | Type-C / 保護回路付き / 10 個 | 200〜600 円 | https://ja.aliexpress.com/item/1005006904523567.html |
 | 9 | MT3608 昇圧モジュール 5 個入り | 18 | 4 パック | — | 1,160 円 | https://ja.aliexpress.com/item/1005003780554002.html |
-| 10 | 電源ボタン 子機用 (Pten 16mm) | 8 | 8 個 | **〇〇 LED (1NO)** / **Self-locking (1NO)** / **3-6V** / **16mm (1NO)** | 4,152 円 | https://ja.aliexpress.com/item/1005007168217107.html |
-| 11 | 電源ボタン 親機用 (LA16-11D, 5A) | 1 | 1 個 | 丸型 / **自己保持** / LED **6V 以下** | 282 円 | https://ja.aliexpress.com/item/10000308991702.html |
+| 10 | 電源ボタン 子機用 (Pten 16mm) | 8 | 8 個 | カラー: **Red LED (1NO)** など LED 付きの色 (「NO LED」以外) / **Self-locking (1NO)** / **3-6V** / **16mm (1NO)** | 4,152 円 | https://ja.aliexpress.com/item/1005007168217107.html |
+| 11 | 電源ボタン 親機用 (LA16-11D, 5A) | 1 | 1 個 | 丸型 / **自己保持 (セルフロック)** / LED **6V** | 282 円 | https://ja.aliexpress.com/item/10000308991702.html |
 | 12 | DFPlayer Mini | 1 | 1 個 | — | 152 円 | https://ja.aliexpress.com/item/32665891488.html |
 | 13 | スピーカー 40mm 2 個入り | 1 | 1 パック | **8Ω 2W** | 262 円 | https://ja.aliexpress.com/item/1005009194024331.html |
 | 14 | TM1637 4 桁表示 (0.36 インチ) | 1 | 1 個 | 赤 | 109 円 | https://ja.aliexpress.com/item/1005001993464723.html |
@@ -34,10 +34,10 @@
 | | **合計** | | | | **約 32,900 円** | (送料別) |
 
 - 抵抗の必要数: 330Ω 9 本 / 1kΩ 11 本 / 10kΩ 9 本 / 100kΩ 18 本 (キットは各 20 本入りなので足ります)
-- ボタンのあまり: Red 1 個、Green 4 個
+- ボタンの使い方: Red は子機 8 個 + 親機の正解ボタン (右) 1 個、Blue は親機の不正解ボタン (左) 1 個。あまりは Red 1 個、Blue 4 個
 - 18650 電池が金額の 3 割を占めます。偽物や日本へ発送できない出品があるので、届かない場合は国内で同等品を買ってください
 - 18650 電池と LA16 ボタンの商品ページは、オプションと在庫を確認できていません。注文前に確認してください
-- 半球カバーと Green 60mm ボタンは在庫が少なめでした
+- 半球カバーと Blue 60mm ボタンは在庫が少なめでした (Blue は確認時に残り 6 パック)
 
 ## 国内で用意するもの (持っていなければ)
 

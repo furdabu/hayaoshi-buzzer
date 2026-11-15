@@ -1,5 +1,7 @@
 #include "radio.h"
 
+#include "config.h"  // WIFI_TX_POWER
+
 #include <WiFi.h>
 #include <esp_arduino_version.h>
 #include <esp_now.h>

@@ -149,7 +149,7 @@ def arcade_button(x: float, y: float, z: float) -> tuple[Part, Part]:
 
 GRAY_DARK = (0.30, 0.32, 0.36)
 GRAY = (0.78, 0.79, 0.82)
-DOME = (1.0, 0.97, 0.90)
+COVER = (0.97, 0.96, 0.93)  # 乳白の半球カバー (光の色は LED で決まるので、消灯時の白で描く)
 
 
 def pc_cover(p: enc.Params) -> Part:
@@ -181,7 +181,7 @@ def child_assembly(p: enc.Params):
         (Pos(0, 0, top_z) * enc.child_top(p), GRAY, 1.0),
         (rim, (0.15, 0.15, 0.15), 1.0),
         (cap, (0.95, 0.20, 0.15), 1.0),
-        (Pos(lx, ly, top_z + p.plate_t) * pc_cover(p), (1.0, 0.62, 0.15), 0.85),
+        (Pos(lx, ly, top_z + p.plate_t) * pc_cover(p), COVER, 1.0),
     ]
 
 
@@ -192,13 +192,14 @@ def master_assembly(p: enc.Params):
         (enc.master_base(p), GRAY_DARK, 1.0),
         (Pos(0, 0, top_z) * enc.master_top(p), GRAY, 1.0),
     ]
-    colors = [(0.15, 0.75, 0.25), (0.90, 0.15, 0.15)]
+    # 司会者から見て 左: 不正解 (青) / 右: 正解 (赤)
+    colors = [(0.15, 0.35, 0.90), (0.90, 0.15, 0.15)]
     for (bx, by), c in zip(enc.MASTER_BUTTONS, colors):
         rim, cap = arcade_button(bx, by, top_z + p.plate_t)
         items += [(rim, (0.15, 0.15, 0.15), 1.0), (cap, c, 1.0)]
-    for (lx, ly), c in zip(enc.MASTER_LAMPS, colors):
-        tint = tuple(0.55 + 0.45 * v for v in c)
-        items.append((Pos(lx, ly, top_z + p.plate_t) * pc_cover(p), tint, 0.85))
+    # 中央のランプ
+    for lx, ly in enc.MASTER_LAMPS:
+        items.append((Pos(lx, ly, top_z + p.plate_t) * pc_cover(p), COVER, 1.0))
     return items
 
 
@@ -227,7 +228,7 @@ def child_inside(p: enc.Params):
         (Pos(enc.CHILD_POWER_X, wall_y - 14, p.power_button_z) * Rot(90, 0, 0) * Cylinder(9, 28), METAL, 1.0),
         (box_at(5, 18, f, 17, 36, 6), BOOST, 1.0),  # MT3608 (5V)
         (box_at(5, 62, f, 17, 36, 6), BOOST, 1.0),  # MT3608 (12V, ボタン LED 用)
-        (box_at(36, 0, f, 18, 23, 6), BOARD, 1.0),  # ESP32-C3 SuperMini
+        (box_at(36, 0, f, 23, 18, 6), BOARD, 1.0),  # ESP32-C3 SuperMini (アンテナを右の壁へ向ける)
         (Pos(bx, by, h - 40) * Cylinder(15, 40, align=enc.MIN), BUTTON_BODY, 1.0),  # ボタンの胴体
     ]
 
@@ -242,7 +243,7 @@ def master_inside(p: enc.Params):
     items.append((box_at(cx, cy, f, 77, p.master_holder_w - 0.5, 20), BATTERY, 1.0))  # 3 本用並列ボックス
     items += [
         (box_at(wall_x - 14.5, enc.MASTER_CHARGER_Y, f + p.charger_ledge_h, 28, 17, 1.2), BOARD, 1.0),
-        (Pos(wall_x - 14, enc.MASTER_POWER_Y, p.power_button_z) * Rot(0, 90, 0) * Cylinder(9, 28), METAL, 1.0),
+        (Pos(wall_x - 23, enc.MASTER_POWER_Y, p.power_button_z) * Rot(0, 90, 0) * Cylinder(11, 46), METAL, 1.0),  # 電源ボタン (LA16)
         (box_at(83, -43, f, 28, 55, 10), BOARD, 1.0),  # ESP32
         (box_at(-88, -50, f, 21, 21, 8), BOARD, 1.0),  # DFPlayer
         (box_at(5, -30, f, 36, 17, 6), BOOST, 1.0),  # MT3608 (5V)
@@ -265,7 +266,7 @@ def lamp_section(p: enc.Params):
     cut = Pos(0, 50, 0) * Box(200, 100, 200)
     return [
         (plate - cut, GRAY, 1.0),
-        (cover - cut, (1.0, 0.62, 0.15), 1.0),
+        (cover - cut, COVER, 1.0),
         (board - cut, (0.1, 0.35, 0.8), 1.0),
     ]
 
