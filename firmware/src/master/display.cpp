@@ -109,6 +109,8 @@ constexpr uint8_t kBlank = 0;
 constexpr uint8_t kDash = SEG_G;
 constexpr uint8_t kLowerC = SEG_D | SEG_E | SEG_G;
 constexpr uint8_t kUpperP = SEG_A | SEG_B | SEG_E | SEG_F | SEG_G;
+constexpr uint8_t kLowerB = SEG_C | SEG_D | SEG_E | SEG_F | SEG_G;
+constexpr uint8_t kUpperL = SEG_D | SEG_E | SEG_F;
 
 Tm1637 g_tm(PIN_TM_CLK, PIN_TM_DIO);
 uint8_t g_shown[4] = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -156,6 +158,15 @@ void showWinner(int id) {
 
 void showRegister(int nextId) { prefixed(kUpperP, nextId); }
 
+void showBattery(int percent) { prefixed(kLowerB, percent); }
+
+void showLowChild(int id) { prefixed(kUpperL, id); }
+
+void blank() {
+  const uint8_t s[4] = {kBlank, kBlank, kBlank, kBlank};
+  write(s);
+}
+
 }  // namespace display
 
 #else
@@ -166,6 +177,9 @@ void showBoot() {}
 void showConnected(int) {}
 void showWinner(int) {}
 void showRegister(int) {}
+void showBattery(int) {}
+void showLowChild(int) {}
+void blank() {}
 }  // namespace display
 
 #endif

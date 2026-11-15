@@ -16,6 +16,7 @@ class Registry {
 
   void touch(const uint8_t mac[6], uint32_t nowMs);
   int connected(uint32_t nowMs, uint32_t timeoutMs) const;
+  bool isConnected(uint8_t id, uint32_t nowMs, uint32_t timeoutMs) const;
   uint8_t count() const { return count_; }
 
  private:

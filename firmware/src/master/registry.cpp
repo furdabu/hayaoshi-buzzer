@@ -60,10 +60,16 @@ void Registry::touch(const uint8_t mac[6], uint32_t nowMs) {
 
 int Registry::connected(uint32_t nowMs, uint32_t timeoutMs) const {
   int n = 0;
-  for (uint8_t i = 0; i < count_; ++i) {
-    if (lastSeen_[i] != 0 && nowMs - lastSeen_[i] <= timeoutMs) ++n;
+  for (uint8_t id = 1; id <= count_; ++id) {
+    if (isConnected(id, nowMs, timeoutMs)) ++n;
   }
   return n;
+}
+
+bool Registry::isConnected(uint8_t id, uint32_t nowMs, uint32_t timeoutMs) const {
+  if (id == 0 || id > count_) return false;
+  const uint32_t seen = lastSeen_[id - 1];
+  return seen != 0 && nowMs - seen <= timeoutMs;
 }
 
 void Registry::save() {

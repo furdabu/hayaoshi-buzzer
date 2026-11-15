@@ -10,8 +10,11 @@ ESP32 で作る **ワイヤレス早押しクイズボタン** です。
 ## 特徴
 
 - **ワイヤレス**: ESP-NOW (ESP32 同士の直接通信) を使うので、配線もルーターも不要
+- **充電式**: 18650 電池 + Type-C 充電 + 電源ボタン。子機は電池 1 本で約 9〜11 時間、親機は電池 3 本で約 25〜30 時間 (計算値)。
+  電池残量も表示します
+- **ボタンが光って状態を知らせる**: 子機は今押せるときだけ、親機は判定待ちのときにボタンが光ります
 - **公平な判定**: 電波が届いた順ではなく「ボタンを押した瞬間の時刻」で判定 ([仕組み](docs/protocol.md))
-- **汎用部品だけ**: ESP32 開発ボード / 60mm アーケードボタン / WS2812B LED リング / DFPlayer Mini
+- **汎用部品だけ**: ESP32 開発ボード / 60mm アーケードボタン / WS2812B LED / 乳白の半球カバー / DFPlayer Mini / TM1637 4 桁表示
 - **3D プリント用データつき**: STL (そのまま印刷) と STEP (CAD で編集)、寸法を変えられる Python スクリプト
 - **効果音つき**: 正解「ピンポーン」・不正解「ブッブー」・回答権「ピコーン」を同梱 (自作音源なので自由に使えます)
 - **子機ごとの設定は不要**: 全子機に同じファームウェアを書き込むだけ。番号は親機が自動で割り振ります
@@ -34,24 +37,35 @@ ESP32 で作る **ワイヤレス早押しクイズボタン** です。
 | | 赤で点滅 | 自分の回答が不正解だった |
 | | 青く短く点滅 | 親機が見つからない (電源・距離を確認) |
 | | 紫でゆっくり明滅 / 白く点灯 | 番号登録モード: 未登録 / 登録済み |
-| 親機ランプ | 緑 | 正解 (3 秒間) |
-| | 赤 | 不正解 (3 秒間) |
+| | 電源を入れたとき 緑 / 黄 / 赤 | 電池残量: 半分以上 / 少なめ / 要充電 |
+| | 4 秒ごとに赤く短く光る | 電池残量わずか (充電してください) |
+| | 赤く 3 回光って消える | 電池切れ寸前で休止した (充電してから電源を入れ直す) |
+| 子機のボタン | 光っている | **今押せる** (受付中で、このラウンドではまだ押していない) |
+| | 消えている | 押せない (ほかの人や自分が回答中・このラウンドで押した後・親機につながっていない) |
+| 親機ランプ | 緑 | 正解 (5 秒間) |
+| | 赤 | 不正解 (5 秒間) |
+| | 4 秒ごとに赤ランプが短く光る | 親機の電池残量わずか |
+| 親機の正解・不正解ボタン | 光っている | **判定待ち** (回答者が決まった。どちらかを押してください) |
+| | 点滅 | 番号登録モード中 (押すと終了) |
 | 親機の 4 桁表示 | `c 12` | 接続中の子機が 12 台 |
 | | `  12` | 12 番の子機が回答権を獲得 |
 | | `P  5` | 番号登録モード (次に押した子機が 5 番になる) |
+| | `b 87` | 親機の電池残量 87% (起動時と、残量わずかのとき) |
+| | `L  7` | 7 番の子機の電池残量がわずか (待機中に `c 12` と交互に表示) |
 
 ## 必要なもの
 
-詳しくは [部品表](docs/bom.md) を見てください。
+詳しくは [部品表](docs/bom.md) を、商品ページへのリンクと必要数は [買い物リスト](docs/shopping-list.md) を見てください。
 
 | | 子機 (1 台あたり) | 親機 |
 | --- | --- | --- |
-| マイコン | ESP32 開発ボード (または ESP32-C3 SuperMini) | ESP32 開発ボード |
-| ボタン | 60mm アーケードボタン x1 | 60mm アーケードボタン x2 (緑・赤) |
-| ランプ | WS2812B 16 連 LED リング x1 | WS2812B 16 連 LED リング x2 |
+| マイコン | ESP32-C3 SuperMini | ESP32 開発ボード (ESP32-DevKitC など) |
+| ボタン | 60mm 押しボタン (12V LED 付き) x1 | 同じボタン x2 (緑・赤) |
+| ランプ | WS2812B 7 連 LED 丸型基板 + 半球カバー (直径 68mm) x1 | 同じもの x2 (緑・赤) |
 | 音 | — | DFPlayer Mini + microSD + スピーカー |
-| 表示 (任意) | — | TM1637 4 桁 7 セグモジュール |
-| 電源 | USB 充電器 / モバイルバッテリー | USB 充電器 (5V 2A) |
+| 表示 | — | TM1637 4 桁 7 セグモジュール (0.36 インチ) |
+| 電源 | 18650 x1 + TP4056 Type-C 充電モジュール + MT3608 昇圧モジュール + 電源ボタン | 18650 **x3** (並列) + 子機と同じ構成 |
+| 充電 | USB 充電器 + Type-C ケーブル | 同じ |
 | ケース | 3D プリント 3 パーツ | 3D プリント 4 パーツ |
 
 ## 作り方
@@ -69,18 +83,29 @@ ESP32 で作る **ワイヤレス早押しクイズボタン** です。
 
 ```bash
 cd firmware
-pio run -e master -t upload     # 親機
-pio run -e child -t upload      # 子機 (ESP32)
-pio run -e child_c3 -t upload   # 子機 (ESP32-C3 SuperMini を使う場合)
+pio run -e master -t upload     # 親機 (ESP32 DevKit)
+pio run -e child -t upload      # 子機 (ESP32-C3 SuperMini)
 ```
 
 子機は全台に同じファームウェアを書き込めば OK です。個別の設定はありません。
+
+- 書き込むときは **電源ボタンを OFF** にしてから、開発ボードに USB ケーブルをつないでください
+- SuperMini が書き込めないときは、基板の **BOOT ボタンを押したまま USB を挿し**、離してから書き込んでください
 シリアルモニタ (`pio device monitor`) を開くと、誰が何 ms で押したかなどのログが見られます。
 
 ## 使い方
 
 - 親機と子機の電源を入れる順番は自由です。子機は自動で親機を見つけます
 - 子機の番号は、親機に初めてつながった順に自動で割り振られ、親機に保存されます
+
+### 電源と充電
+
+- **電源ボタン** を押すと ON、もう一度押すと OFF です
+- **充電** は **電源ボタンを OFF にして** Type-C ケーブルをつなぎます。子機は約 3〜4 時間、親機 (電池 3 本) は約 10 時間なので一晩かけて充電してください
+- 電源を入れたときの子機ランプの色 (緑 / 黄 / 赤) と、親機の `b 87` 表示で残量がわかります
+- 残量が少なくなると、子機は 4 秒ごとに赤く短く光り、親機の表示にその子機の番号 (`L  7`) が出ます
+- 電池が切れる寸前 (3.2V) になると、電池を守るために赤く 3 回光って休止します。充電してから電源を入れ直してください
+- 子機の充電は、多ポートの USB 充電器を使うとまとめてできて便利です
 
 ### 番号を振り直す (番号登録モード)
 
@@ -102,12 +127,15 @@ pio run -e child_c3 -t upload   # 子機 (ESP32-C3 SuperMini を使う場合)
 | `WIFI_CHANNEL` | 1 | 無線のチャンネル。親機と子機で同じにする |
 | `GROUP_ID` | 1 | 同じ部屋で 2 セット以上使うときにセットごとに変える |
 | `MAX_CHILDREN` | 64 | 子機の最大台数 |
-| `JUDGE_LAMP_MS` | 3000 | 判定ランプの点灯時間。0 なら次の早押しまで点灯 |
+| `JUDGE_LAMP_MS` | 5000 | 判定ランプの点灯時間。0 なら次の早押しまで点灯 |
 | `WINNER_COLOR` | `0xFF7800` | 子機の回答ランプの色 |
-| `LAMP_BRIGHTNESS` | 160 | ランプの明るさ (0〜255) |
+| `LAMP_BRIGHTNESS` | 255 | ランプの明るさ (0〜255) |
 | `AUDIO_VOLUME` | 24 | 音量 (0〜30) |
-| `USE_DISPLAY` | 1 | 4 桁表示を使わないなら 0 |
-| `MASTER_LEDS_PER_LAMP` / `CHILD_LAMP_LEDS` | 16 | LED リングの LED 数 |
+| `MASTER_LEDS_PER_LAMP` / `CHILD_LAMP_LEDS` | 7 | ランプの LED 数 (7 連基板) |
+| `BATTERY_LOW_MV` | 3450 | これより低いと「残量わずか」(mV) |
+| `BATTERY_DIVIDER` | 2.0 | 電池電圧の分圧比。表示がずれるときに微調整 |
+| `BATTERY_CUTOFF_MV` | 3200 | これを 10 秒下回ると電池を守るために休止 (mV) |
+| `WIFI_TX_POWER` | (最大) | 無線の送信出力。子機の通信が不安定なときに `WIFI_POWER_8_5dBm` などに下げる |
 | `ARBITRATION_WINDOW_MS` | 50 | 最初の押下から判定までの待ち時間 |
 
 ピン番号も同じファイルで変更できます。ケースの寸法は `hardware/enclosure/enclosure.py` の `Params` で変更します。
@@ -130,7 +158,7 @@ hardware/
 sounds/
   sd/mp3/                microSD にコピーする効果音
   generate_sounds.py     効果音を合成するスクリプト
-docs/                    部品表・配線図・組み立て・通信の仕組み
+docs/                    部品表・買い物リスト・配線図・組み立て・通信の仕組み
 ```
 
 ## 開発
@@ -159,4 +187,5 @@ python sounds/generate_sounds.py
 A wireless quiz buzzer system built on ESP32 and ESP-NOW. One master unit supports up to 64 buzzer units, with no Wi-Fi router needed.
 Only the first buzzer pressed lights up. Others are locked out until the host presses *correct* or *incorrect* on the master, which plays a sound, lights the green or red lamp, and resets the round.
 Fairness is based on press timestamps synchronised to the master clock, not on radio arrival order.
-Uses generic parts (ESP32 dev board, 60 mm arcade buttons, WS2812B rings, DFPlayer Mini) and includes 3D-printable enclosures (STL/STEP plus a parametric build123d script).
+Uses generic parts (ESP32 dev board, 60 mm arcade buttons, WS2812B 7-LED boards under 68 mm diffuser covers, DFPlayer Mini, TM1637 4-digit display) and includes 3D-printable enclosures (STL/STEP plus a parametric build123d script).
+Both units run on rechargeable 18650 cells (1 in each buzzer, 3 in parallel in the master) with USB Type-C charging (TP4056), an MT3608 boost converter, a latching power button and battery-level indication.

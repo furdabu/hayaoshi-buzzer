@@ -2,6 +2,7 @@
 #include <unity.h>
 
 #include "arbiter.h"
+#include "battery_level.h"
 #include "clock_sync.h"
 
 using buzzer::Arbiter;
@@ -149,6 +150,52 @@ static void test_end_to_end_two_children() {
   TEST_ASSERT_EQUAL_MEMORY(B, w.mac, 6);
 }
 
+static void test_battery_percent() {
+  TEST_ASSERT_EQUAL(0, buzzer::batteryPercent(3000));
+  TEST_ASSERT_EQUAL(0, buzzer::batteryPercent(3300));
+  TEST_ASSERT_EQUAL(50, buzzer::batteryPercent(3800));
+  TEST_ASSERT_EQUAL(40, buzzer::batteryPercent(3750));  // 30 と 50 の中間
+  TEST_ASSERT_EQUAL(100, buzzer::batteryPercent(4150));
+  TEST_ASSERT_EQUAL(100, buzzer::batteryPercent(4300));
+  // 電圧が上がれば残量は減らない
+  int prev = 0;
+  for (int mv = 3200; mv <= 4300; mv += 5) {
+    const int p = buzzer::batteryPercent(mv);
+    TEST_ASSERT_TRUE(p >= prev);
+    prev = p;
+  }
+}
+
+static void test_battery_low_hysteresis() {
+  bool low = false;
+  low = buzzer::batteryLow(low, 3460, 3450, 100);
+  TEST_ASSERT_FALSE(low);
+  low = buzzer::batteryLow(low, 3440, 3450, 100);
+  TEST_ASSERT_TRUE(low);
+  low = buzzer::batteryLow(low, 3500, 3450, 100);  // 少し戻っただけでは解除しない
+  TEST_ASSERT_TRUE(low);
+  low = buzzer::batteryLow(low, 3560, 3450, 100);  // 充電されたら解除
+  TEST_ASSERT_FALSE(low);
+}
+
+static void test_battery_encoding() {
+  TEST_ASSERT_EQUAL(0, buzzer::encodeBattery20mV(0));
+  TEST_ASSERT_EQUAL(3700, buzzer::decodeBattery20mV(buzzer::encodeBattery20mV(3700)));
+  TEST_ASSERT_EQUAL(4200, buzzer::decodeBattery20mV(buzzer::encodeBattery20mV(4195)));
+  TEST_ASSERT_EQUAL(255, buzzer::encodeBattery20mV(9000));
+}
+
+static void test_battery_cutoff_needs_sustained_low() {
+  buzzer::CutoffDetector cut(3200, 3);
+  TEST_ASSERT_FALSE(cut.update(3100));
+  TEST_ASSERT_FALSE(cut.update(3150));
+  TEST_ASSERT_FALSE(cut.update(3300));  // 一度戻ったらやり直し
+  TEST_ASSERT_FALSE(cut.update(3100));
+  TEST_ASSERT_FALSE(cut.update(3100));
+  TEST_ASSERT_TRUE(cut.update(3100));
+  TEST_ASSERT_FALSE(cut.update(0));  // 測れていない値では反応しない
+}
+
 int main(int, char**) {
   UNITY_BEGIN();
   RUN_TEST(test_single_press_wins_after_window);
@@ -162,5 +209,9 @@ int main(int, char**) {
   RUN_TEST(test_clock_sync_uses_least_delayed_beacon);
   RUN_TEST(test_clock_sync_window_forgets_old_samples);
   RUN_TEST(test_end_to_end_two_children);
+  RUN_TEST(test_battery_percent);
+  RUN_TEST(test_battery_low_hysteresis);
+  RUN_TEST(test_battery_encoding);
+  RUN_TEST(test_battery_cutoff_needs_sustained_low);
   return UNITY_END();
 }

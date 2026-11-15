@@ -6,6 +6,7 @@
 //  - 起動時に「正解ボタン」を押したままにすると番号登録モード
 // ============================================================================
 #include <Arduino.h>
+#include <esp_sleep.h>
 #include <esp_timer.h>
 #if __has_include(<esp_random.h>)
 #include <esp_random.h>
@@ -13,6 +14,8 @@
 
 #include "arbiter.h"
 #include "audio.h"
+#include "battery.h"
+#include "battery_level.h"
 #include "button.h"
 #include "config.h"
 #include "display.h"
@@ -59,6 +62,9 @@ uint32_t g_nextBurstMs = 0;
 // ---- ランプ演出 ----
 Result g_lampResult = Result::None;
 uint32_t g_lampResultSinceMs = 0;
+
+// ---- 子機の電池 (番号 - 1 で引く) ----
+bool g_childLow[MAX_CHILDREN] = {};
 
 void sendState() {
   proto::StatePacket p = {};
@@ -171,6 +177,18 @@ void handleHello(const RxPacket& rx) {
     }
   }
   if (id != 0 && p.knownId != id) sendAssign(rx.mac, id, false);
+
+  // 子機の電池残量 (0 = 電池なし)
+  if (id != 0) {
+    const int mv = buzzer::decodeBattery20mV(p.battery20mV);
+    const bool wasLow = g_childLow[id - 1];
+    const bool low = mv > 0 && buzzer::batteryLow(wasLow, mv, BATTERY_LOW_MV, 100);
+    if (low != wasLow) {
+      Serial.printf("[battery] #%u %.2f V %s\n", id, mv / 1000.0,
+                    low ? "残量わずか" : "回復");
+    }
+    g_childLow[id - 1] = low;
+  }
 }
 
 void processRadio() {
@@ -260,9 +278,53 @@ void renderLamps(uint32_t nowMs) {
     }
   }
 
+  // 親機の電池残量わずか: 何も表示していないときに 4 秒ごとに赤ランプが短く光る
+  if (green == 0 && red == 0 && battery::low() && (nowMs % 4000) < 150) {
+    red = Lamp::scale(kRed, 80);
+  }
+
   g_lamp.fill(green, 0, kLedsPerLamp);
   g_lamp.fill(red, kLedsPerLamp, kLedsPerLamp);
   g_lamp.show();
+}
+
+// 正解・不正解ボタンの内蔵 LED
+//   点灯: 判定待ち (回答者が決まった) / 点滅: 番号登録モード (押すと終了) / 消灯: それ以外
+void renderJudgeButtonLeds(uint32_t nowMs) {
+  if (PIN_JUDGE_LED < 0) return;
+  static int shownLevel = -1;
+  int level = 0;
+  if (g_registerMode) {
+    level = (nowMs / 500) % 2 == 0 ? BUTTON_LED_LEVEL : 0;
+  } else if (g_state == RoundState::Locked) {
+    level = BUTTON_LED_LEVEL;
+  }
+  if (level != shownLevel) {
+    analogWrite(PIN_JUDGE_LED, level);
+    shownLevel = level;
+  }
+}
+
+// 待機中の表示: 接続台数 → (親機の電池残量) → (電池が少ない子機の番号) を 2 秒ごとに切り替える
+void renderIdleDisplay(uint32_t nowMs) {
+  constexpr int kMaxLowShown = 8;
+  uint8_t lowIds[kMaxLowShown];
+  int lowCount = 0;
+  for (uint8_t id = 1; id <= g_registry.count() && lowCount < kMaxLowShown; ++id) {
+    if (g_childLow[id - 1] && g_registry.isConnected(id, nowMs, CHILD_TIMEOUT_MS)) {
+      lowIds[lowCount++] = id;
+    }
+  }
+  const int selfPages = battery::low() ? 1 : 0;
+  const int pages = 1 + selfPages + lowCount;
+  const int page = static_cast<int>((nowMs / 2000) % pages);
+  if (page == 0) {
+    display::showConnected(g_registry.connected(nowMs, CHILD_TIMEOUT_MS));
+  } else if (page <= selfPages) {
+    display::showBattery(battery::percent());
+  } else {
+    display::showLowChild(lowIds[page - 1 - selfPages]);
+  }
 }
 
 void renderDisplay(uint32_t nowMs) {
@@ -271,7 +333,7 @@ void renderDisplay(uint32_t nowMs) {
   } else if (g_state == RoundState::Locked) {
     display::showWinner(g_winnerId);
   } else {
-    display::showConnected(g_registry.connected(nowMs, CHILD_TIMEOUT_MS));
+    renderIdleDisplay(nowMs);
   }
   status_led::set(g_registerMode ? (nowMs / 250) % 2 == 0 : true);
 }
@@ -299,12 +361,34 @@ void lampTest() {
   g_lamp.show();
 }
 
+// 電池切れ寸前: 電池を守るため、ランプ・表示・無線を止めて休止する (電源ボタンの入れ直しで復帰)
+void shutdownForLowBattery() {
+  Serial.println(F("[battery] 電池切れ寸前のため停止します。充電してから電源を入れ直してください"));
+  if (PIN_JUDGE_LED >= 0) analogWrite(PIN_JUDGE_LED, 0);
+  for (int i = 0; i < 3; ++i) {
+    g_lamp.fill(Lamp::scale(kRed, 120), kLedsPerLamp, kLedsPerLamp);
+    g_lamp.show();
+    delay(150);
+    g_lamp.clear();
+    g_lamp.show();
+    delay(150);
+  }
+  display::blank();
+  status_led::set(false);
+  Serial.flush();
+  esp_deep_sleep_start();
+}
+
 }  // namespace
 
 void setup() {
   Serial.begin(115200);
   delay(50);
   status_led::begin();
+  if (PIN_JUDGE_LED >= 0) {
+    pinMode(PIN_JUDGE_LED, OUTPUT);
+    digitalWrite(PIN_JUDGE_LED, LOW);
+  }
   g_btnCorrect.begin();
   g_btnIncorrect.begin();
   g_lamp.begin();
@@ -316,6 +400,7 @@ void setup() {
   if (checkRegisterModeAtBoot()) {
     g_registerMode = true;
     g_registry.clear();
+    memset(g_childLow, 0, sizeof(g_childLow));
     Serial.println(F("[register] 番号登録モード: 子機のボタンを番号順に押してください"));
     Serial.println(F("[register] 終わったら正解/不正解ボタンのどちらかを押すと通常モードに戻ります"));
   }
@@ -337,8 +422,16 @@ void setup() {
                 FW_VERSION_MINOR, radio::macToString(mac).c_str(), WIFI_CHANNEL, GROUP_ID,
                 g_registry.count());
 
+  // 起動時に電池残量を表示 ("b 87")
+  battery::begin();
+  if (battery::present()) {
+    display::showBattery(battery::percent());
+    Serial.printf("[battery] %d mV (%d%%)\n", battery::millivolts(), battery::percent());
+  }
+
   audio::begin();
   lampTest();
+  delay(battery::present() ? 600 : 0);
   audio::play(audio::Sound::Startup);
 
   g_arbiter.reset(esp_timer_get_time());
@@ -353,8 +446,11 @@ void loop() {
   // (古い時刻との差を取ると負になり、uint32_t で巨大な値になってしまう)
   const uint32_t nowMs = millis();
   processBroadcast(nowMs);
+  battery::update(nowMs);
+  if (battery::critical()) shutdownForLowBattery();
   audio::update();
   renderLamps(nowMs);
+  renderJudgeButtonLeds(nowMs);
   renderDisplay(nowMs);
   delay(1);
 }

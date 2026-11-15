@@ -6,8 +6,10 @@
 //    (自分で勝手に点けないので、負けた子機が一瞬光ることもない)
 // ============================================================================
 #include <Arduino.h>
+#include <esp_sleep.h>
 #include <esp_timer.h>
 
+#include "battery.h"
 #include "clock_sync.h"
 #include "config.h"
 #include "lamp.h"
@@ -126,6 +128,7 @@ void sendHello() {
   p.fwMajor = FW_VERSION_MAJOR;
   p.fwMinor = FW_VERSION_MINOR;
   p.knownId = g_myId;
+  p.battery20mV = battery::encoded();
   radio::sendTo(g_masterMac, &p, sizeof(p));
 }
 
@@ -366,17 +369,47 @@ void renderLamp(uint32_t nowMs) {
     }
   }
 
+  // 電池残量わずか: 何も表示していないときに 4 秒ごとに赤く短く光る
+  if (color == 0 && battery::low() && (nowMs % 4000) < 150) {
+    color = Lamp::scale(kRed, 80);
+  }
+
   g_lamp.fill(color);
   g_lamp.show();
 
   // ボタン内蔵 LED: 押せるとき / 回答権があるときに点灯
+  // ボタン内蔵 LED: 「今押せる」ときだけ点灯
+  //   点灯: 受付中でまだこのラウンドで押していない / 番号登録モードで未登録
+  //   消灯: 他の人が回答中・自分が回答中・このラウンドで押した後・親機につながっていない
   if (PIN_BUTTON_LED >= 0) {
+    static int shownLevel = -1;
     const bool pressable =
         conn && ((registerMode() && !g_registeredThisMode) ||
                  (g_armed && !(g_pressSent && g_pressRound == g_armedRound)));
-    digitalWrite(PIN_BUTTON_LED, (pressable || (conn && iAmWinner())) ? HIGH : LOW);
+    const int level = pressable ? BUTTON_LED_LEVEL : 0;
+    if (level != shownLevel) {
+      analogWrite(PIN_BUTTON_LED, level);
+      shownLevel = level;
+    }
   }
   status_led::set(conn ? true : (nowMs / 500) % 2 == 0);
+}
+
+// 電池切れ寸前: 電池を守るため、LED と無線を止めて休止する (電源ボタンの入れ直しで復帰)
+void shutdownForLowBattery() {
+  Serial.println(F("[battery] 電池切れ寸前のため停止します。充電してから電源を入れ直してください"));
+  if (PIN_BUTTON_LED >= 0) analogWrite(PIN_BUTTON_LED, 0);
+  for (int i = 0; i < 3; ++i) {
+    g_lamp.fill(Lamp::scale(kRed, 120));
+    g_lamp.show();
+    delay(150);
+    g_lamp.clear();
+    g_lamp.show();
+    delay(150);
+  }
+  status_led::set(false);
+  Serial.flush();
+  esp_deep_sleep_start();
 }
 
 }  // namespace
@@ -408,10 +441,19 @@ void setup() {
   Serial.printf("FW %d.%d  MAC %s  CH %d  GROUP %d\n", FW_VERSION_MAJOR, FW_VERSION_MINOR,
                 radio::macToString(g_myMac).c_str(), WIFI_CHANNEL, GROUP_ID);
 
-  // 起動確認に一瞬だけ光らせる
-  g_lamp.fill(kWinnerColor);
+  // 起動確認。電池があれば残量の色 (緑: 半分以上 / 黄: 少なめ / 赤: 要充電) で 0.6 秒光る
+  battery::begin();
+  uint32_t bootColor = kWinnerColor;
+  uint32_t bootMs = 200;
+  if (battery::present()) {
+    const int pct = battery::percent();
+    bootColor = pct >= 50 ? kGreen : (pct >= 15 ? 0xFFC000 : kRed);
+    bootMs = 600;
+    Serial.printf("[battery] %d mV (%d%%)\n", battery::millivolts(), pct);
+  }
+  g_lamp.fill(bootColor);
   g_lamp.show();
-  delay(200);
+  delay(bootMs);
   g_lamp.clear();
   g_lamp.show();
 }
@@ -424,6 +466,8 @@ void loop() {
   const uint32_t nowMs = millis();
   processPressRetry(nowMs);
   processHello(nowMs);
+  battery::update(nowMs);
+  if (battery::critical()) shutdownForLowBattery();
   renderLamp(nowMs);
   delay(1);
 }

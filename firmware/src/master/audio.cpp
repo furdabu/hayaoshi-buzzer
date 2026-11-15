@@ -10,54 +10,11 @@
 #define DFPLAYER_SKIP_CHECK 0
 #endif
 
-// 1: DFPlayer が見つからないときだけブザーを鳴らす / 0: 常にブザーも鳴らす
-#ifndef BUZZER_FALLBACK_ONLY
-#define BUZZER_FALLBACK_ONLY 1
-#endif
-
 namespace audio {
 namespace {
 
 DFRobotDFPlayerMini g_df;
 bool g_dfReady = false;
-
-struct Note {
-  uint16_t freq;  // 0 = 休符
-  uint16_t ms;
-};
-
-const Note kCorrect[] = {{988, 140}, {0, 30}, {784, 600}};      // ピン・ポーン
-const Note kIncorrect[] = {{170, 180}, {0, 70}, {170, 600}};    // ブッ・ブー
-const Note kBuzzIn[] = {{1760, 70}, {2349, 280}};               // ピコーン
-const Note kStartup[] = {{1047, 90}, {1319, 90}, {1568, 160}};  // ドミソ
-
-const Note* g_seq = nullptr;
-size_t g_len = 0;
-size_t g_index = 0;
-uint32_t g_noteEndMs = 0;
-
-bool buzzerEnabled() {
-  if (PIN_BUZZER < 0) return false;
-  return !(BUZZER_FALLBACK_ONLY && g_dfReady);
-}
-
-void startNote(uint32_t nowMs) {
-  const Note& n = g_seq[g_index];
-  if (n.freq == 0) {
-    noTone(PIN_BUZZER);
-  } else {
-    tone(PIN_BUZZER, n.freq);
-  }
-  g_noteEndMs = nowMs + n.ms;
-}
-
-template <size_t N>
-void startSequence(const Note (&notes)[N]) {
-  g_seq = notes;
-  g_len = N;
-  g_index = 0;
-  startNote(millis());
-}
 
 }  // namespace
 
@@ -84,41 +41,12 @@ void begin() {
 }
 
 void play(Sound sound) {
-  if (g_dfReady) {
-    g_df.playMp3Folder(static_cast<int>(sound));
-  }
-  if (buzzerEnabled()) {
-    switch (sound) {
-      case Sound::Correct:
-        startSequence(kCorrect);
-        break;
-      case Sound::Incorrect:
-        startSequence(kIncorrect);
-        break;
-      case Sound::BuzzIn:
-        startSequence(kBuzzIn);
-        break;
-      case Sound::Startup:
-        startSequence(kStartup);
-        break;
-    }
-  }
+  if (g_dfReady) g_df.playMp3Folder(static_cast<int>(sound));
 }
 
 void update() {
   // DFPlayer からの通知 (再生終了など) は使わないので読み捨てる
   while (Serial2.available()) Serial2.read();
-
-  if (g_seq == nullptr) return;
-  const uint32_t now = millis();
-  if (static_cast<int32_t>(now - g_noteEndMs) < 0) return;
-  ++g_index;
-  if (g_index >= g_len) {
-    noTone(PIN_BUZZER);
-    g_seq = nullptr;
-    return;
-  }
-  startNote(now);
 }
 
 bool dfplayerReady() { return g_dfReady; }
