@@ -185,6 +185,17 @@ static void test_battery_encoding() {
   TEST_ASSERT_EQUAL(255, buzzer::encodeBattery20mV(9000));
 }
 
+static void test_battery_cutoff_needs_sustained_low() {
+  buzzer::CutoffDetector cut(3200, 3);
+  TEST_ASSERT_FALSE(cut.update(3100));
+  TEST_ASSERT_FALSE(cut.update(3150));
+  TEST_ASSERT_FALSE(cut.update(3300));  // 一度戻ったらやり直し
+  TEST_ASSERT_FALSE(cut.update(3100));
+  TEST_ASSERT_FALSE(cut.update(3100));
+  TEST_ASSERT_TRUE(cut.update(3100));
+  TEST_ASSERT_FALSE(cut.update(0));  // 測れていない値では反応しない
+}
+
 int main(int, char**) {
   UNITY_BEGIN();
   RUN_TEST(test_single_press_wins_after_window);
@@ -201,5 +212,6 @@ int main(int, char**) {
   RUN_TEST(test_battery_percent);
   RUN_TEST(test_battery_low_hysteresis);
   RUN_TEST(test_battery_encoding);
+  RUN_TEST(test_battery_cutoff_needs_sustained_low);
   return UNITY_END();
 }

@@ -176,7 +176,7 @@ def child_inside(p: enc.Params):
     bx, by = enc.CHILD_BUTTON
     return [
         (enc.child_base(p), GRAY_DARK, 1.0),
-        (box_at(cx, cy, f, 20.5, 77, 19), BATTERY, 1.0),  # 18650 電池ボックス
+        (box_at(cx, cy, f, p.child_holder_w - 0.5, 77, 20), BATTERY, 1.0),  # 18650 電池ボックス (1 本用)
         (box_at(enc.CHILD_CHARGER_X, wall_y - 14.5, f + p.charger_ledge_h, 17, 28, 1.2), BOARD, 1.0),
         (Pos(enc.CHILD_POWER_X, wall_y - 14, p.power_button_z) * Rot(90, 0, 0) * Cylinder(9, 28), METAL, 1.0),
         (box_at(5, 18, f, 17, 36, 6), BOOST, 1.0),  # MT3608 (5V)
@@ -191,15 +191,13 @@ def master_inside(p: enc.Params):
     w, d, h = enc.MASTER_SIZE
     f = p.floor
     cx, cy = enc.MASTER_CELLS["center"]
-    pitch = p.cell_holder_w + 0.6 + p.rail_t
     wall_x = w / 2 - p.wall
     items = [(enc.master_base(p), GRAY_DARK, 1.0)]
-    for i in (-1, 0, 1):
-        items.append((box_at(cx, cy + i * pitch, f, 77, 20.5, 19), BATTERY, 1.0))
+    items.append((box_at(cx, cy, f, 77, p.master_holder_w - 0.5, 20), BATTERY, 1.0))  # 3 本用並列ボックス
     items += [
         (box_at(wall_x - 14.5, enc.MASTER_CHARGER_Y, f + p.charger_ledge_h, 28, 17, 1.2), BOARD, 1.0),
         (Pos(wall_x - 14, enc.MASTER_POWER_Y, p.power_button_z) * Rot(0, 90, 0) * Cylinder(9, 28), METAL, 1.0),
-        (box_at(86, -48, f, 28, 55, 10), BOARD, 1.0),  # ESP32
+        (box_at(83, -43, f, 28, 55, 10), BOARD, 1.0),  # ESP32
         (box_at(-88, -50, f, 21, 21, 8), BOARD, 1.0),  # DFPlayer
         (box_at(5, -30, f, 36, 17, 6), BOOST, 1.0),  # MT3608 (5V)
         (box_at(5, -55, f, 36, 17, 6), BOOST, 1.0),  # MT3608 (12V, ボタン LED 用)

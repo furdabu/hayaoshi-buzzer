@@ -6,6 +6,7 @@
 //  - 起動時に「正解ボタン」を押したままにすると番号登録モード
 // ============================================================================
 #include <Arduino.h>
+#include <esp_sleep.h>
 #include <esp_timer.h>
 #if __has_include(<esp_random.h>)
 #include <esp_random.h>
@@ -360,6 +361,24 @@ void lampTest() {
   g_lamp.show();
 }
 
+// 電池切れ寸前: 電池を守るため、ランプ・表示・無線を止めて休止する (電源ボタンの入れ直しで復帰)
+void shutdownForLowBattery() {
+  Serial.println(F("[battery] 電池切れ寸前のため停止します。充電してから電源を入れ直してください"));
+  if (PIN_JUDGE_LED >= 0) analogWrite(PIN_JUDGE_LED, 0);
+  for (int i = 0; i < 3; ++i) {
+    g_lamp.fill(Lamp::scale(kRed, 120), kLedsPerLamp, kLedsPerLamp);
+    g_lamp.show();
+    delay(150);
+    g_lamp.clear();
+    g_lamp.show();
+    delay(150);
+  }
+  display::blank();
+  status_led::set(false);
+  Serial.flush();
+  esp_deep_sleep_start();
+}
+
 }  // namespace
 
 void setup() {
@@ -428,6 +447,7 @@ void loop() {
   const uint32_t nowMs = millis();
   processBroadcast(nowMs);
   battery::update(nowMs);
+  if (battery::critical()) shutdownForLowBattery();
   audio::update();
   renderLamps(nowMs);
   renderJudgeButtonLeds(nowMs);

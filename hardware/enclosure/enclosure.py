@@ -69,7 +69,9 @@ class Params:
 
     # ---- 電源 (電池・充電・電源ボタン) ----
     # 18650 電池ボックス (1 本用) を挟むレール
-    cell_holder_w: float = 21.0  # 電池ボックスの幅
+    # 並列タイプの 18650 電池ボックス (子機は 1 本用、親機は 3 本用) の幅。届いたら測って合わせる
+    child_holder_w: float = 21.0
+    master_holder_w: float = 61.0
     cell_rail_len: float = 60.0
     cell_rail_h: float = 8.0
     rail_t: float = 1.6
@@ -95,7 +97,7 @@ CHILD_SIZE = (110.0, 180.0, 60.0)
 CHILD_BUTTON = (0.0, -42.0)
 CHILD_LAMP = (0.0, 45.0)
 # 電源まわりの配置 (電池は左の壁沿い, 充電口と電源ボタンは背面)
-CHILD_CELLS = dict(center=(-39.5, -10.0), count=1, axis="y")
+CHILD_CELLS = dict(center=(-39.5, -10.0), axis="y", holder="child")
 CHILD_CHARGER_X = -22.0  # 背面の壁での充電口の位置
 CHILD_POWER_X = 24.0  # 背面の壁での電源ボタンの位置
 
@@ -105,10 +107,10 @@ MASTER_BUTTONS = [(-50.0, -38.0), (50.0, -38.0)]  # 左: 正解(緑) / 右: 不�
 MASTER_LAMPS = [(-50.0, 38.0), (50.0, 38.0)]  # 左: 緑ランプ / 右: 赤ランプ
 DISPLAY_WINDOW = (31.0, 15.0)  # TM1637 0.36 インチ 4 桁表示の窓
 SPEAKER_SLOTS = (7, 2.6, 30.0, 5.2)  # 本数, 幅, 高さ, 間隔
-# 電源まわりの配置 (電池は左奥に 3 本を並列, 充電口と電源ボタンは右の壁)
+# 電源まわりの配置 (3 本用の並列電池ボックスを左奥に, 充電口と電源ボタンは右の壁)
 # 電池は左のボタンの真下を避け、スピーカーにも当たらない位置にしている
-MASTER_CELLS = dict(center=(-55.0, 17.6), count=3, axis="x")
-MASTER_CHARGER_Y = -10.0  # 右の壁での充電口の位置
+MASTER_CELLS = dict(center=(-55.0, 17.6), axis="x", holder="master")
+MASTER_CHARGER_Y = 0.0  # 右の壁での充電口の位置
 MASTER_POWER_Y = 40.0  # 右の壁での電源ボタンの位置
 
 
@@ -270,18 +272,28 @@ def power_button_cut(p: Params) -> Part:
     return Pos(0, p.wall / 2, z) * Rot(90, 0, 0) * Cylinder(p.power_button_d / 2, p.wall * 3)
 
 
-def cell_rails(p: Params, count: int, axis: str) -> Part:
-    """18650 電池ボックス (1 本用) を count 個並べて挟むレール。axis = 電池の向き"""
-    gap = p.cell_holder_w + 0.6
-    pitch = gap + p.rail_t
-    total = count * gap + (count + 1) * p.rail_t
+def cell_rails(p: Params, holder_w: float, axis: str) -> Part:
+    """電池ボックスを両側から挟むレール。axis = 電池の向き"""
+    gap = holder_w + 0.6
     rails = Part()
-    for i in range(count + 1):
-        y = -total / 2 + p.rail_t / 2 + i * pitch
-        rails += Pos(0, y, 0) * Box(p.cell_rail_len, p.rail_t, p.cell_rail_h, align=MIN)
+    for sy in (-1, 1):
+        rails += Pos(0, sy * (gap / 2 + p.rail_t / 2), 0) * Box(
+            p.cell_rail_len, p.rail_t, p.cell_rail_h, align=MIN
+        )
     if axis == "y":
         rails = Rot(0, 0, 90) * rails
     return rails
+
+
+def charger_vents(p: Params) -> Part:
+    """充電モジュールの熱を逃がす穴: 基板の下の床に 3 本、Type-C の上の壁に 5 本 (局所座標)"""
+    vents = Part()
+    for x in (-5.0, 0.0, 5.0):
+        vents += Pos(x, -p.charger_l / 2 - 1, -p.floor - 1) * Box(2.0, p.charger_l - 8, p.floor + 2, align=MIN)
+    z0 = p.usbc_z + p.usbc_recess_h / 2 + 3
+    for x in (-6.0, -3.0, 0.0, 3.0, 6.0):
+        vents += Pos(x, p.wall / 2, z0) * Box(1.8, p.wall * 3, 10.0, align=MIN)
+    return vents
 
 
 def battery_features(
@@ -296,9 +308,11 @@ def battery_features(
 ) -> Part:
     # 電池ボックスのレール (center = 並べた電池全体の中心)
     cx, cy = cells["center"]
-    body += Pos(cx, cy, p.floor) * cell_rails(p, cells["count"], cells["axis"])
+    holder_w = p.child_holder_w if cells["holder"] == "child" else p.master_holder_w
+    body += Pos(cx, cy, p.floor) * cell_rails(p, holder_w, cells["axis"])
     body += place_on_wall(charger_cradle(p), charger_wall, charger_along, size, p)
     body -= place_on_wall(charger_port_cut(p), charger_wall, charger_along, size, p)
+    body -= place_on_wall(charger_vents(p), charger_wall, charger_along, size, p)
     body -= place_on_wall(power_button_cut(p), power_wall, power_along, size, p)
     return body
 

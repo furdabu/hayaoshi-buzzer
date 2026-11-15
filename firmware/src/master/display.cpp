@@ -162,6 +162,11 @@ void showBattery(int percent) { prefixed(kLowerB, percent); }
 
 void showLowChild(int id) { prefixed(kUpperL, id); }
 
+void blank() {
+  const uint8_t s[4] = {kBlank, kBlank, kBlank, kBlank};
+  write(s);
+}
+
 }  // namespace display
 
 #else
@@ -174,6 +179,7 @@ void showWinner(int) {}
 void showRegister(int) {}
 void showBattery(int) {}
 void showLowChild(int) {}
+void blank() {}
 }  // namespace display
 
 #endif

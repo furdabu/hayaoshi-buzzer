@@ -50,6 +50,9 @@ bool begin(uint8_t channel, size_t queueDepth) {
 
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
+#ifdef WIFI_TX_POWER
+  WiFi.setTxPower(WIFI_TX_POWER);
+#endif
   esp_wifi_set_ps(WIFI_PS_NONE);  // 省電力を切って遅延を減らす
   esp_wifi_set_promiscuous(true);
   esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE);

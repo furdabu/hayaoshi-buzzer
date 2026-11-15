@@ -8,15 +8,18 @@
 namespace battery {
 namespace {
 
-// この範囲外の値は「電池の電圧が測れていない (配線の外れなど)」とみなす
-constexpr int kPresentMinMv = 2800;
+// この範囲外の値は「電池の電圧が測れていない (分圧回路の配線外れなど)」とみなす
+constexpr int kPresentMinMv = 1500;
 constexpr int kPresentMaxMv = 4600;
 constexpr int kHysteresisMv = 100;
 constexpr uint32_t kIntervalMs = 1000;
+constexpr int kCutoffSamples = 10;  // 10 秒続けて下回ったら停止
 
 int g_mv = 0;
 bool g_low = false;
 uint32_t g_lastMs = 0;
+buzzer::CutoffDetector g_cutoff(BATTERY_CUTOFF_MV, kCutoffSamples);
+bool g_critical = false;
 
 int measure() {
   uint32_t sum = 0;
@@ -37,13 +40,17 @@ void update(uint32_t nowMs) {
   g_lastMs = nowMs;
   // 無線の送信などで値がぶれるので、ゆっくり追従させる
   g_mv = (g_mv * 3 + measure()) / 4;
-  g_low = present() && buzzer::batteryLow(g_low, g_mv, BATTERY_LOW_MV, kHysteresisMv);
+  if (present()) {
+    g_low = buzzer::batteryLow(g_low, g_mv, BATTERY_LOW_MV, kHysteresisMv);
+    g_critical = g_cutoff.update(g_mv);
+  }
 }
 
 bool present() { return g_mv >= kPresentMinMv && g_mv <= kPresentMaxMv; }
 int millivolts() { return present() ? g_mv : 0; }
 int percent() { return present() ? buzzer::batteryPercent(g_mv) : 0; }
 bool low() { return g_low; }
+bool critical() { return g_critical; }
 uint8_t encoded() { return buzzer::encodeBattery20mV(millivolts()); }
 
 }  // namespace battery

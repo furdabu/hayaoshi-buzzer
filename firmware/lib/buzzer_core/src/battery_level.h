@@ -22,6 +22,25 @@ inline bool batteryLow(bool wasLow, int mv, int lowMv, int hysteresisMv) {
   return wasLow ? mv < lowMv + hysteresisMv : mv < lowMv;
 }
 
+// 電池切れ寸前の判定。cutoffMv を samples 回続けて下回ったら true (一瞬の電圧低下では反応しない)
+class CutoffDetector {
+ public:
+  CutoffDetector(int cutoffMv, int samples) : cutoffMv_(cutoffMv), samples_(samples) {}
+  bool update(int mv) {
+    if (mv > 0 && mv < cutoffMv_) {
+      if (count_ < samples_) ++count_;
+    } else {
+      count_ = 0;
+    }
+    return count_ >= samples_;
+  }
+
+ private:
+  int cutoffMv_;
+  int samples_;
+  int count_ = 0;
+};
+
 // 無線で送るための 1 バイト表現 (20mV 単位, 0 = 不明)
 inline unsigned char encodeBattery20mV(int mv) {
   if (mv <= 0) return 0;

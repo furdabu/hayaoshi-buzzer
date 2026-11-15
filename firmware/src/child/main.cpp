@@ -6,6 +6,7 @@
 //    (自分で勝手に点けないので、負けた子機が一瞬光ることもない)
 // ============================================================================
 #include <Arduino.h>
+#include <esp_sleep.h>
 #include <esp_timer.h>
 
 #include "battery.h"
@@ -394,6 +395,23 @@ void renderLamp(uint32_t nowMs) {
   status_led::set(conn ? true : (nowMs / 500) % 2 == 0);
 }
 
+// 電池切れ寸前: 電池を守るため、LED と無線を止めて休止する (電源ボタンの入れ直しで復帰)
+void shutdownForLowBattery() {
+  Serial.println(F("[battery] 電池切れ寸前のため停止します。充電してから電源を入れ直してください"));
+  if (PIN_BUTTON_LED >= 0) analogWrite(PIN_BUTTON_LED, 0);
+  for (int i = 0; i < 3; ++i) {
+    g_lamp.fill(Lamp::scale(kRed, 120));
+    g_lamp.show();
+    delay(150);
+    g_lamp.clear();
+    g_lamp.show();
+    delay(150);
+  }
+  status_led::set(false);
+  Serial.flush();
+  esp_deep_sleep_start();
+}
+
 }  // namespace
 
 void setup() {
@@ -449,6 +467,7 @@ void loop() {
   processPressRetry(nowMs);
   processHello(nowMs);
   battery::update(nowMs);
+  if (battery::critical()) shutdownForLowBattery();
   renderLamp(nowMs);
   delay(1);
 }
