@@ -18,6 +18,8 @@ ESP32 で作る **ワイヤレス早押しクイズボタン** です。
 - **3D プリント用データつき**: STL (そのまま印刷) と STEP (CAD で編集)、寸法を変えられる Python スクリプト
 - **効果音つき**: 正解「ピンポーン」・不正解「ブッブー」・回答権「ピコーン」を同梱 (自作音源なので自由に使えます)
 - **子機ごとの設定は不要**: 全子機に同じファームウェアを書き込むだけ。番号は親機が自動で割り振ります
+- **パソコンと連携できる (使う人だけ)**: 受信機 (ESP32-C3 SuperMini 1 個) を USB でつなぐと、だれが回答中か・正解か不正解かを
+  パソコンでリアルタイムに受け取れます ([PC 連携](docs/pc-link.md))
 
 ## 動き方
 
@@ -91,6 +93,7 @@ ESP32 で作る **ワイヤレス早押しクイズボタン** です。
 cd firmware
 pio run -e master -t upload     # 親機 (ESP32 DevKit)
 pio run -e child -t upload      # 子機 (ESP32-C3 SuperMini)
+pio run -e receiver -t upload   # PC 連携の受信機 (使う人だけ。docs/pc-link.md)
 ```
 
 子機は全台に同じファームウェアを書き込めば OK です。個別の設定はありません。
@@ -156,6 +159,7 @@ firmware/                PlatformIO プロジェクト
   lib/buzzer_core/       判定ロジック (PC でテスト可能)
   src/master/            親機
   src/child/             子機
+  src/receiver/          PC 連携の受信機
   src/common/            共通 (無線・LED・電池)
   test/                  ユニットテスト (pio test -e native)
 hardware/
@@ -164,10 +168,12 @@ hardware/
   enclosure/             ケースを生成する Python スクリプト (build123d)
   wiring/                はんだ付けマニュアルの図・表・PDF を作る Python スクリプト
   pcb/                   中継基板のプリント基板 (注文用のデータ) と、それを作る Python スクリプト
+pc/
+  monitor.html           パソコンで状態を見るページ (PC 連携)
 sounds/
   sd/mp3/                microSD にコピーする効果音
   generate_sounds.py     効果音を合成するスクリプト
-docs/                    部品表・買い物リスト・配線図・はんだ付けマニュアル・基板の注文・組み立て・通信の仕組み
+docs/                    部品表・買い物リスト・配線図・はんだ付けマニュアル・基板の注文・組み立て・通信の仕組み・PC 連携
 ```
 
 ## 開発
@@ -198,3 +204,4 @@ Only the first buzzer pressed lights up. Others are locked out until the host pr
 Fairness is based on press timestamps synchronised to the master clock, not on radio arrival order.
 Uses generic parts (ESP32 dev board, 60 mm arcade buttons, WS2812B 7-LED boards under 68 mm diffuser covers, DFPlayer Mini, TM1637 4-digit display) and includes 3D-printable enclosures (STL/STEP plus a parametric build123d script).
 Both units run on rechargeable 18650 cells (1 in each buzzer, 3 in parallel in the master) with USB Type-C charging (TP4056), an MT3608 boost converter, a latching power button and battery-level indication.
+Optionally, a spare ESP32-C3 plugged into a PC listens to the master and streams the game state (who buzzed in, correct / incorrect) as JSON lines over USB ([docs/pc-link.md](docs/pc-link.md), not yet tested on hardware).

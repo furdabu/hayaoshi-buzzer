@@ -66,6 +66,14 @@ uint32_t g_lampResultSinceMs = 0;
 // ---- 子機の電池 (番号 - 1 で引く) ----
 bool g_childLow[MAX_CHILDREN] = {};
 
+// ---- PC 連携 (受信機) 向けの追加情報 ----
+uint32_t g_lastInfoMs = 0;
+bool g_infoNow = false;  // 次の loop() ですぐ送る
+uint16_t g_buzzRound = 0;
+uint8_t g_buzzId = 0;
+uint8_t g_buzzCandidates = 0;
+uint32_t g_buzzElapsedMs = 0;
+
 void sendState() {
   proto::StatePacket p = {};
   proto::fillHeader(p.h, proto::MsgType::State, GROUP_ID);
@@ -80,6 +88,34 @@ void sendState() {
   memcpy(p.lastWinnerMac, g_lastWinnerMac, 6);
   p.flags = g_registerMode ? proto::kFlagRegisterMode : 0;
   p.masterTimeUs = esp_timer_get_time();  // 送信直前に時刻を入れる
+  radio::sendBroadcast(&p, sizeof(p));
+}
+
+// PC 連携の受信機に向けて、子機の接続・電池と、直近の回答者の情報を送る (docs/pc-link.md)
+void sendInfo(uint32_t nowMs) {
+  proto::InfoPacket p = {};
+  proto::fillHeader(p.h, proto::MsgType::Info, GROUP_ID);
+  p.bootId = g_bootId;
+  p.registered = g_registry.count();
+  uint8_t connected = 0;
+  uint64_t connectedMask = 0;
+  uint64_t lowMask = 0;
+  for (uint8_t id = 1; id <= g_registry.count() && id <= 64; ++id) {
+    if (!g_registry.isConnected(id, nowMs, CHILD_TIMEOUT_MS)) continue;
+    const uint64_t bit = 1ULL << (id - 1);
+    connectedMask |= bit;
+    ++connected;
+    if (g_childLow[id - 1]) lowMask |= bit;
+  }
+  p.connected = connected;
+  p.connectedMask = connectedMask;
+  p.lowBatteryMask = lowMask;
+  p.masterBattery20mV = battery::encoded();
+  p.flags = battery::low() ? proto::kInfoMasterBatteryLow : 0;
+  p.buzzRound = g_buzzRound;
+  p.buzzId = g_buzzId;
+  p.buzzCandidates = g_buzzCandidates;
+  p.buzzElapsedMs = g_buzzElapsedMs;
   radio::sendBroadcast(&p, sizeof(p));
 }
 
@@ -220,6 +256,14 @@ void processArbiter() {
   g_lampResult = Result::None;  // 前の判定ランプを消す
   requestBurst();
   audio::play(audio::Sound::BuzzIn);
+
+  // PC 連携用: 受付開始から押すまでの時間などを覚えて、すぐ送る
+  const int64_t elapsedUs = winner.pressUs - g_arbiter.openUs();
+  g_buzzRound = g_round;
+  g_buzzId = g_winnerId;
+  g_buzzCandidates = static_cast<uint8_t>(g_arbiter.candidateCount());
+  g_buzzElapsedMs = elapsedUs > 0 ? static_cast<uint32_t>((elapsedUs + 500) / 1000) : 0;
+  g_infoNow = true;
   Serial.printf("[buzz] 回答権: #%u  (+%.1f ms, 候補 %u 台)\n", g_winnerId,
                 static_cast<double>(winner.pressUs - g_arbiter.openUs()) / 1000.0,
                 static_cast<unsigned>(g_arbiter.candidateCount()));
@@ -252,6 +296,15 @@ void processBroadcast(uint32_t nowMs) {
     sendState();
     g_lastBeaconMs = nowMs;
   }
+}
+
+// PC 連携用の追加情報: 1 秒ごと + 回答者が決まったとき。
+// 状態 (State) の送信のあとに呼ぶので、子機への知らせが遅れることはない
+void processInfo(uint32_t nowMs) {
+  if (!g_infoNow && nowMs - g_lastInfoMs < INFO_INTERVAL_MS) return;
+  g_infoNow = false;
+  g_lastInfoMs = nowMs;
+  sendInfo(nowMs);
 }
 
 // 中央のランプ: 正解 = 赤 / 不正解 = 青 (JUDGE_LAMP_MS の間)、番号登録モード = 紫でゆっくり明滅
@@ -438,6 +491,7 @@ void loop() {
   // (古い時刻との差を取ると負になり、uint32_t で巨大な値になってしまう)
   const uint32_t nowMs = millis();
   processBroadcast(nowMs);
+  processInfo(nowMs);
   battery::update(nowMs);
   if (battery::critical()) shutdownForLowBattery();
   audio::update();

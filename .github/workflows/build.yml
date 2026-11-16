@@ -23,11 +23,11 @@ jobs:
         run: pio test -e native
       - name: Build
         working-directory: firmware
-        run: pio run -e master -e child
+        run: pio run -e master -e child -e receiver
       - name: Collect binaries
         run: |
           mkdir -p dist
-          for env in master child; do
+          for env in master child receiver; do
             cp firmware/.pio/build/$env/firmware.bin dist/$env.bin
           done
       - uses: actions/upload-artifact@v4

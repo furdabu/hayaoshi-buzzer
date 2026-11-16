@@ -7,7 +7,7 @@
 #pragma once
 
 #define FW_VERSION_MAJOR 1
-#define FW_VERSION_MINOR 0
+#define FW_VERSION_MINOR 1
 
 // ---------------------------------------------------------------------------
 //  無線 (ESP-NOW)
@@ -185,6 +185,7 @@
 #define MASTER_TIMEOUT_MS 1500     // これだけ親機から届かなければ「未接続」
 #define HELLO_INTERVAL_MS 1000     // 子機の生存通知間隔
 #define CHILD_TIMEOUT_MS 3500      // これだけ子機から届かなければ接続数から外す
+#define INFO_INTERVAL_MS 1000      // 親機が PC 連携用の追加情報を送る間隔
 #define PRESS_RETRIES 4            // 押下パケットの再送回数
 #define PRESS_RETRY_MS 15          // 押下パケットの再送間隔
 #define EARLY_TOLERANCE_MS 5       // 受付開始より前の押下として捨てるまでの許容誤差
