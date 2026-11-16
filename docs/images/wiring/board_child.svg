@@ -1,0 +1,320 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 814 600" width="814" height="600" font-family="'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP','Yu Gothic',Meiryo,sans-serif" role="img">
+<title>中継基板 (子機用)</title>
+<rect width="814" height="600" fill="#ffffff"/>
+<text x="24.0" y="26.0" font-size="21" fill="#212529" text-anchor="start" font-weight="bold" dominant-baseline="central" >中継基板 (子機用)</text>
+<text x="24.0" y="50.0" font-size="14.5" fill="#495057" text-anchor="start" font-weight="normal" dominant-baseline="central" >部品をのせる面から見た図。横 1 列 (同じ行) は裏の銅はくでつながっています</text>
+<rect x="69.0" y="91.0" width="522.0" height="414.0" rx="6" fill="#e9dcc3" stroke="#a68a5b" stroke-width="1.6" />
+<text x="96.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >a</text>
+<text x="132.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >b</text>
+<text x="168.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >c</text>
+<text x="204.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >d</text>
+<text x="240.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >e</text>
+<text x="276.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >f</text>
+<text x="312.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >g</text>
+<text x="348.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >h</text>
+<text x="384.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >i</text>
+<text x="420.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >j</text>
+<text x="456.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >k</text>
+<text x="492.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >l</text>
+<text x="528.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >m</text>
+<text x="564.0" y="79.1" font-size="14" fill="#495057" text-anchor="middle" font-weight="bold" dominant-baseline="central" >n</text>
+<rect x="79.8" y="110.0" width="500.4" height="16.0" rx="8" fill="#d9a45b" stroke="none" stroke-width="0" opacity="0.55"/>
+<rect x="36.4" y="107.0" width="22.0" height="22.0" rx="3" fill="#ffffff" stroke="#212529" stroke-width="1.3" />
+<text x="47.4" y="118.5" font-size="12.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >1</text>
+<text x="601.8" y="118.5" font-size="14" fill="#868e96" text-anchor="start" font-weight="normal" dominant-baseline="central" >ベース (線なし)</text>
+<circle cx="96.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="132.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="168.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="204.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="240.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="276.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="312.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="348.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="384.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="420.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="456.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="492.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="528.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="564.0" cy="118.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<rect x="79.8" y="146.0" width="500.4" height="16.0" rx="8" fill="#d9a45b" stroke="none" stroke-width="0" opacity="0.55"/>
+<rect x="36.4" y="143.0" width="22.0" height="22.0" rx="3" fill="#d4c8f8" stroke="#212529" stroke-width="1.3" />
+<text x="47.4" y="154.5" font-size="12.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >2</text>
+<text x="601.8" y="154.5" font-size="14" fill="#212529" text-anchor="start" font-weight="bold" dominant-baseline="central" >ボタン LED −</text>
+<circle cx="96.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="132.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="168.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="204.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="240.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="276.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="312.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="348.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="384.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="420.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="456.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="492.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="528.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="564.0" cy="154.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<rect x="79.8" y="182.0" width="500.4" height="16.0" rx="8" fill="#d9a45b" stroke="none" stroke-width="0" opacity="0.55"/>
+<rect x="36.4" y="179.0" width="22.0" height="22.0" rx="3" fill="#bcbebf" stroke="#212529" stroke-width="1.3" />
+<text x="47.4" y="190.5" font-size="12.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >3</text>
+<text x="601.8" y="190.5" font-size="14" fill="#212529" text-anchor="start" font-weight="bold" dominant-baseline="central" >GND</text>
+<circle cx="96.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="132.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="168.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="204.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="240.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="276.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="312.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="348.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="384.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="420.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="456.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="492.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="528.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="564.0" cy="190.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<rect x="79.8" y="218.0" width="500.4" height="16.0" rx="8" fill="#d9a45b" stroke="none" stroke-width="0" opacity="0.55"/>
+<rect x="36.4" y="215.0" width="22.0" height="22.0" rx="3" fill="#bcbebf" stroke="#212529" stroke-width="1.3" />
+<text x="47.4" y="226.5" font-size="12.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >4</text>
+<text x="601.8" y="226.5" font-size="14" fill="#212529" text-anchor="start" font-weight="bold" dominant-baseline="central" >GND</text>
+<circle cx="96.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="132.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="168.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="204.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="240.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="276.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="312.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="348.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="384.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="420.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="456.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="492.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="528.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="564.0" cy="226.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<rect x="79.8" y="254.0" width="500.4" height="16.0" rx="8" fill="#d9a45b" stroke="none" stroke-width="0" opacity="0.55"/>
+<rect x="36.4" y="251.0" width="22.0" height="22.0" rx="3" fill="#f8e8b2" stroke="#212529" stroke-width="1.3" />
+<text x="47.4" y="262.5" font-size="12.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >5</text>
+<text x="601.8" y="262.5" font-size="14" fill="#212529" text-anchor="start" font-weight="bold" dominant-baseline="central" >ボタン LED 信号</text>
+<circle cx="96.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="132.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="168.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="204.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="240.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="276.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="312.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="348.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="384.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="420.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="456.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="492.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="528.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="564.0" cy="262.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<rect x="79.8" y="290.0" width="500.4" height="16.0" rx="8" fill="#d9a45b" stroke="none" stroke-width="0" opacity="0.55"/>
+<rect x="36.4" y="287.0" width="22.0" height="22.0" rx="3" fill="#f4c8b7" stroke="#212529" stroke-width="1.3" />
+<text x="47.4" y="298.5" font-size="12.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >6</text>
+<text x="601.8" y="298.5" font-size="14" fill="#212529" text-anchor="start" font-weight="bold" dominant-baseline="central" >LED 電源</text>
+<circle cx="96.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="132.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="168.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="204.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="240.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="276.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="312.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="348.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="384.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="420.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="456.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="492.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="528.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="564.0" cy="298.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<rect x="79.8" y="326.0" width="500.4" height="16.0" rx="8" fill="#d9a45b" stroke="none" stroke-width="0" opacity="0.55"/>
+<rect x="36.4" y="323.0" width="22.0" height="22.0" rx="3" fill="#dbdde0" stroke="#212529" stroke-width="1.3" />
+<text x="47.4" y="334.5" font-size="12.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >7</text>
+<text x="601.8" y="334.5" font-size="14" fill="#212529" text-anchor="start" font-weight="bold" dominant-baseline="central" >電池測定</text>
+<circle cx="96.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="132.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="168.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="204.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="240.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="276.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="312.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="348.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="384.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="420.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="456.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="492.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="528.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="564.0" cy="334.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<rect x="79.8" y="362.0" width="500.4" height="16.0" rx="8" fill="#d9a45b" stroke="none" stroke-width="0" opacity="0.55"/>
+<rect x="36.4" y="359.0" width="22.0" height="22.0" rx="3" fill="#c1e2c7" stroke="#212529" stroke-width="1.3" />
+<text x="47.4" y="370.5" font-size="12.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >8</text>
+<text x="601.8" y="370.5" font-size="14" fill="#212529" text-anchor="start" font-weight="bold" dominant-baseline="central" >データ 入口</text>
+<circle cx="96.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="132.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="168.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="204.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="240.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="276.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="312.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="348.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="384.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="420.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="456.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="492.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="528.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="564.0" cy="370.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<rect x="79.8" y="398.0" width="500.4" height="16.0" rx="8" fill="#d9a45b" stroke="none" stroke-width="0" opacity="0.55"/>
+<rect x="36.4" y="395.0" width="22.0" height="22.0" rx="3" fill="#fadcb2" stroke="#212529" stroke-width="1.3" />
+<text x="47.4" y="406.5" font-size="12.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >9</text>
+<text x="601.8" y="406.5" font-size="14" fill="#212529" text-anchor="start" font-weight="bold" dominant-baseline="central" >5V</text>
+<circle cx="96.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="132.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="168.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="204.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="240.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="276.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="312.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="348.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="384.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="420.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="456.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="492.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="528.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="564.0" cy="406.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<rect x="79.8" y="434.0" width="500.4" height="16.0" rx="8" fill="#d9a45b" stroke="none" stroke-width="0" opacity="0.55"/>
+<rect x="36.4" y="431.0" width="22.0" height="22.0" rx="3" fill="#f6c1c1" stroke="#212529" stroke-width="1.3" />
+<text x="47.4" y="442.5" font-size="12.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >10</text>
+<text x="601.8" y="442.5" font-size="14" fill="#212529" text-anchor="start" font-weight="bold" dominant-baseline="central" >電池 +</text>
+<circle cx="96.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="132.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="168.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="204.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="240.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="276.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="312.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="348.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="384.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="420.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="456.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="492.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="528.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="564.0" cy="442.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<rect x="79.8" y="470.0" width="500.4" height="16.0" rx="8" fill="#d9a45b" stroke="none" stroke-width="0" opacity="0.55"/>
+<rect x="36.4" y="467.0" width="22.0" height="22.0" rx="3" fill="#c1e2c7" stroke="#212529" stroke-width="1.3" />
+<text x="47.4" y="478.5" font-size="12.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >11</text>
+<text x="601.8" y="478.5" font-size="14" fill="#212529" text-anchor="start" font-weight="bold" dominant-baseline="central" >データ 出口</text>
+<circle cx="96.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="132.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="168.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="204.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="240.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="276.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="312.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="348.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="384.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="420.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="456.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="492.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="528.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="564.0" cy="478.0" r="4.2" fill="#ffffff" stroke="#8c6d3f" stroke-width="1.1" />
+<circle cx="456.0" cy="262.0" r="68.7924" fill="#1c7ed6" stroke="#1864ab" stroke-width="1.6" fill-opacity="0.16" stroke-dasharray="6 4"/>
+<line x1="168.0" y1="262.0" x2="168.0" y2="118.0" stroke="#6c757d" stroke-width="2.6" stroke-linecap="round" />
+<rect x="158.5" y="156.9" width="19.0" height="66.2" rx="7" fill="#f3d9a4" stroke="#a67c2e" stroke-width="1.3" />
+<text x="168.0" y="190.0" font-size="10.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" transform="rotate(-90 168.0 190.0)">1kΩ</text>
+<circle cx="168.0" cy="262.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<circle cx="168.0" cy="118.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<line x1="204.0" y1="118.0" x2="204.0" y2="226.0" stroke="#6c757d" stroke-width="2.6" stroke-linecap="round" />
+<rect x="194.5" y="138.9" width="19.0" height="66.2" rx="7" fill="#f3d9a4" stroke="#a67c2e" stroke-width="1.3" />
+<text x="204.0" y="172.0" font-size="10.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" transform="rotate(-90 204.0 172.0)">10kΩ</text>
+<circle cx="204.0" cy="118.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<circle cx="204.0" cy="226.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<line x1="240.0" y1="190.0" x2="240.0" y2="226.0" stroke="#212529" stroke-width="4" stroke-linecap="round" />
+<circle cx="240.0" cy="190.0" r="5.2" fill="#212529" stroke="none" stroke-width="1.0" />
+<circle cx="240.0" cy="226.0" r="5.2" fill="#212529" stroke="none" stroke-width="1.0" />
+<path d="M285.0,130.0 L285.0,178.0 L274.0,178.0 A24,24 0 0 1 274.0,130.0 Z" fill="#343a40" stroke="#000000" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill-opacity="0.88"/>
+<circle cx="276.0" cy="118.0" r="4.6" fill="#dee2e6" stroke="none" stroke-width="1.0" />
+<text x="296.0" y="118.5" font-size="12.5" fill="#c92a2a" text-anchor="middle" font-weight="bold" dominant-baseline="central" >B</text>
+<circle cx="276.0" cy="154.0" r="4.6" fill="#dee2e6" stroke="none" stroke-width="1.0" />
+<text x="296.0" y="154.5" font-size="12.5" fill="#c92a2a" text-anchor="middle" font-weight="bold" dominant-baseline="central" >C</text>
+<circle cx="276.0" cy="190.0" r="4.6" fill="#dee2e6" stroke="none" stroke-width="1.0" />
+<text x="296.0" y="190.5" font-size="12.5" fill="#c92a2a" text-anchor="middle" font-weight="bold" dominant-baseline="central" >E</text>
+<line x1="285.0" y1="133.0" x2="285.0" y2="175.0" stroke="#ffd43b" stroke-width="4.5" stroke-linecap="round" />
+<line x1="312.0" y1="334.0" x2="312.0" y2="226.0" stroke="#6c757d" stroke-width="2.6" stroke-linecap="round" />
+<rect x="302.5" y="246.9" width="19.0" height="66.2" rx="7" fill="#f3d9a4" stroke="#a67c2e" stroke-width="1.3" />
+<text x="312.0" y="280.0" font-size="10.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" transform="rotate(-90 312.0 280.0)">100kΩ</text>
+<circle cx="312.0" cy="334.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<circle cx="312.0" cy="226.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<line x1="348.0" y1="334.0" x2="348.0" y2="226.0" stroke="#6c757d" stroke-width="2.6" stroke-linecap="round" />
+<ellipse cx="348.0" cy="280.0" rx="9" ry="22.3" fill="#f59f00" stroke="#b76e00" stroke-width="1.3"/>
+<text x="348.0" y="280.0" font-size="10.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" transform="rotate(-90 348.0 280.0)">104</text>
+<circle cx="348.0" cy="334.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<circle cx="348.0" cy="226.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<circle cx="456.0" cy="298.0" r="9.5" fill="#1864ab" stroke="#1864ab" stroke-width="2" />
+<text x="456.0" y="298.5" font-size="13" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >＋</text>
+<circle cx="456.0" cy="226.0" r="9.5" fill="#ffffff" stroke="#1864ab" stroke-width="2" />
+<text x="456.0" y="226.5" font-size="13" fill="#1864ab" text-anchor="middle" font-weight="bold" dominant-baseline="central" >−</text>
+<text x="471.0" y="262.0" font-size="11.5" fill="#1864ab" text-anchor="start" font-weight="bold" dominant-baseline="central" >1000µF</text>
+<line x1="384.0" y1="298.0" x2="384.0" y2="406.0" stroke="#6c757d" stroke-width="2.6" stroke-linecap="round" />
+<rect x="374.5" y="323.9" width="19.0" height="56.2" rx="7" fill="#343a40" stroke="#212529" stroke-width="1.3" />
+<rect x="374.5" y="328.9" width="19.0" height="7.0" rx="0.0" fill="#dee2e6" stroke="none" stroke-width="1.0" />
+<text x="384.0" y="356.0" font-size="9" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" transform="rotate(-90 384.0 356.0)">1N4001</text>
+<circle cx="384.0" cy="298.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<circle cx="384.0" cy="406.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<line x1="204.0" y1="442.0" x2="204.0" y2="334.0" stroke="#6c757d" stroke-width="2.6" stroke-linecap="round" />
+<rect x="194.5" y="354.9" width="19.0" height="66.2" rx="7" fill="#f3d9a4" stroke="#a67c2e" stroke-width="1.3" />
+<text x="204.0" y="388.0" font-size="10.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" transform="rotate(-90 204.0 388.0)">100kΩ</text>
+<circle cx="204.0" cy="442.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<circle cx="204.0" cy="334.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<line x1="240.0" y1="370.0" x2="240.0" y2="478.0" stroke="#6c757d" stroke-width="2.6" stroke-linecap="round" />
+<rect x="230.5" y="390.9" width="19.0" height="66.2" rx="7" fill="#f3d9a4" stroke="#a67c2e" stroke-width="1.3" />
+<text x="240.0" y="424.0" font-size="10.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" transform="rotate(-90 240.0 424.0)">330Ω</text>
+<circle cx="240.0" cy="370.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<circle cx="240.0" cy="478.0" r="4.6" fill="#6c757d" stroke="none" stroke-width="1.0" />
+<circle cx="96.0" cy="442.0" r="12.5" fill="#e03131" stroke="#ffffff" stroke-width="1.6" />
+<text x="96.0" y="442.5" font-size="12.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >4</text>
+<circle cx="96.0" cy="190.0" r="12.5" fill="#212529" stroke="#ffffff" stroke-width="1.6" />
+<text x="96.0" y="190.5" font-size="12.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >5</text>
+<circle cx="132.0" cy="442.0" r="12.5" fill="#e03131" stroke="#ffffff" stroke-width="1.6" />
+<text x="132.0" y="442.5" font-size="12.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >6</text>
+<circle cx="132.0" cy="190.0" r="12.5" fill="#212529" stroke="#ffffff" stroke-width="1.6" />
+<text x="132.0" y="190.5" font-size="12.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >7</text>
+<circle cx="564.0" cy="442.0" r="12.5" fill="#e03131" stroke="#ffffff" stroke-width="1.6" />
+<text x="564.0" y="442.5" font-size="12.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >8</text>
+<circle cx="564.0" cy="226.0" r="12.5" fill="#212529" stroke="#ffffff" stroke-width="1.6" />
+<text x="564.0" y="226.5" font-size="12.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >9</text>
+<circle cx="96.0" cy="406.0" r="12.5" fill="#f08c00" stroke="#ffffff" stroke-width="1.6" />
+<text x="96.0" y="406.5" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >10</text>
+<circle cx="96.0" cy="226.0" r="12.5" fill="#212529" stroke="#ffffff" stroke-width="1.6" />
+<text x="96.0" y="226.5" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >11</text>
+<circle cx="564.0" cy="406.0" r="12.5" fill="#f08c00" stroke="#ffffff" stroke-width="1.6" />
+<text x="564.0" y="406.5" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >12</text>
+<circle cx="564.0" cy="190.0" r="12.5" fill="#212529" stroke="#ffffff" stroke-width="1.6" />
+<text x="564.0" y="190.5" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >13</text>
+<circle cx="564.0" cy="334.0" r="12.5" fill="#868e96" stroke="#ffffff" stroke-width="1.6" />
+<text x="564.0" y="334.5" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >14</text>
+<circle cx="564.0" cy="370.0" r="12.5" fill="#2f9e44" stroke="#ffffff" stroke-width="1.6" />
+<text x="564.0" y="370.5" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >15</text>
+<circle cx="564.0" cy="262.0" r="12.5" fill="#e6b400" stroke="#ffffff" stroke-width="1.6" />
+<text x="564.0" y="262.5" font-size="11.5" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >16</text>
+<circle cx="564.0" cy="478.0" r="12.5" fill="#2f9e44" stroke="#ffffff" stroke-width="1.6" />
+<text x="564.0" y="478.5" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >17</text>
+<circle cx="564.0" cy="298.0" r="12.5" fill="#d9480f" stroke="#ffffff" stroke-width="1.6" />
+<text x="564.0" y="298.5" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >18</text>
+<circle cx="528.0" cy="190.0" r="12.5" fill="#212529" stroke="#ffffff" stroke-width="1.6" />
+<text x="528.0" y="190.5" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >19</text>
+<circle cx="528.0" cy="226.0" r="12.5" fill="#212529" stroke="#ffffff" stroke-width="1.6" />
+<text x="528.0" y="226.5" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >21</text>
+<circle cx="564.0" cy="154.0" r="12.5" fill="#7048e8" stroke="#ffffff" stroke-width="1.6" />
+<text x="564.0" y="154.5" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >23</text>
+<circle cx="132.0" cy="406.0" r="12.5" fill="#f08c00" stroke="#ffffff" stroke-width="1.6" />
+<text x="132.0" y="406.5" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >24</text>
+<circle cx="132.0" cy="226.0" r="12.5" fill="#212529" stroke="#ffffff" stroke-width="1.6" />
+<text x="132.0" y="226.5" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >25</text>
+<circle cx="36.0" cy="540.0" r="11" fill="#495057" stroke="#ffffff" stroke-width="1.6" />
+<text x="36.0" y="540.5" font-size="12.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >1</text>
+<text x="54.0" y="540.0" font-size="13.5" fill="#495057" text-anchor="start" font-weight="normal" dominant-baseline="central" >= その番号の線をはんだ付けする穴 (同じ行ならどの穴でも同じ)</text>
+<rect x="486.0" y="534.0" width="26.0" height="12.0" rx="0.0" fill="#343a40" stroke="none" stroke-width="1.0" />
+<rect x="505.0" y="534.0" width="7.0" height="12.0" rx="0.0" fill="#dee2e6" stroke="none" stroke-width="1.0" />
+<text x="522.0" y="540.0" font-size="13.5" fill="#495057" text-anchor="start" font-weight="normal" dominant-baseline="central" >= ダイオードの帯</text>
+<rect x="24.0" y="561.0" width="5.0" height="14.0" rx="0.0" fill="#ffd43b" stroke="#495057" stroke-width="0.8" />
+<text x="38.0" y="568.0" font-size="13.5" fill="#495057" text-anchor="start" font-weight="normal" dominant-baseline="central" >= トランジスタの平らな面 (印字のある面)。右 (n 列側) に向けます。＋ − はコンデンサの向きです</text>
+</svg>
