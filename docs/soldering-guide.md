@@ -4,7 +4,8 @@
 作業は **はんだ付け** です。難しい技術は使わず、同じ作業のくり返しで完成します。
 
 - 回路の考え方は [配線図のページ](wiring.md) に、ケースへの取り付け方は [組み立てのページ](assembly.md) に書いてあります
-- 図は小さく表示されます。**図をクリックすると大きく開きます**
+- 図は小さく表示されます。**図をクリックすると大きく開きます** <!-- web -->
+- 印刷して手元に置くときは [PDF 版](soldering-guide.pdf) が使えます <!-- web -->
 
 ## 作り方の全体像
 
@@ -602,3 +603,11 @@ python hardware/wiring/make_diagrams.py
 
 注文する基板のデータ (`hardware/pcb/`) は、同じ配線データから `hardware/pcb/make_pcb.py` が作ります ([中継基板を注文する](pcb-order.md))。
 配線を変えたら、こちらも実行し直してください。
+
+PDF 版 (`docs/soldering-guide.pdf`) は `hardware/wiring/make_pdf.py` が、この手順書と図から作ります (Chrome が必要です)。
+手順書や図を直したら、最後にこれも実行し直してください。
+
+```bash
+pip install markdown-it-py
+python hardware/wiring/make_pdf.py
+```
