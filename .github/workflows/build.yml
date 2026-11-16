@@ -60,3 +60,11 @@ jobs:
           python-version: "3.12"
       - name: Check wiring data and regenerate diagrams
         run: python hardware/wiring/make_diagrams.py
+      - name: Generate and check the hub PCB (Gerber)
+        run: |
+          pip install gerbonara
+          python hardware/pcb/make_pcb.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hub-pcb
+          path: hardware/pcb/*.zip

@@ -229,8 +229,8 @@ def child_inside(p: enc.Params):
         (Pos(enc.CHILD_POWER_X, wall_y - 14, p.power_button_z) * Rot(90, 0, 0) * Cylinder(9, 28), METAL, 1.0),
         (box_at(5, 18, f, 17, 36, 6), BOOST, 1.0),  # MT3608 (5V)
         (box_at(5, 62, f, 17, 36, 6), BOOST, 1.0),  # MT3608 (12V, ボタン LED 用)
-        (box_at(36, 0, f, 23, 18, 6), BOARD, 1.0),  # ESP32-C3 SuperMini (アンテナを右の壁へ向ける)
-        (box_at(34, 33, f, 29, 37, 5), HUB, 1.0),  # 中継基板 (14 穴 x 11 行)
+        (box_at(38, -45, f, 23, 18, 6), BOARD, 1.0),  # ESP32-C3 SuperMini (アンテナを右の壁へ向ける)
+        (box_at(35.7, 21, f, 33, 51, 5), HUB, 1.0),  # 中継基板 (注文した基板の大きさ 51 x 33mm。ストリップ基板はこれより小さい)
         (Pos(bx, by, h - 40) * Cylinder(15, 40, align=enc.MIN), BUTTON_BODY, 1.0),  # ボタンの胴体
     ]
 
@@ -248,7 +248,7 @@ def master_inside(p: enc.Params):
         (Pos(wall_x - 23, enc.MASTER_POWER_Y, p.power_button_z) * Rot(0, 90, 0) * Cylinder(11, 46), METAL, 1.0),  # 電源ボタン (LA16)
         (box_at(83, -43, f, 28, 55, 10), BOARD, 1.0),  # ESP32
         (box_at(-88, -50, f, 21, 21, 8), BOARD, 1.0),  # DFPlayer
-        (box_at(30, 20, f, 46, 38, 5), HUB, 1.0),  # 中継基板 (14 穴 x 17 行)
+        (box_at(24, 20, f, 52, 48, 5), HUB, 1.0),  # 中継基板 (注文した基板の大きさ 52 x 48mm。ストリップ基板はこれより小さい)
         (box_at(5, -30, f, 36, 17, 6), BOOST, 1.0),  # MT3608 (5V)
         (box_at(5, -55, f, 36, 17, 6), BOOST, 1.0),  # MT3608 (12V, ボタン LED 用)
         (Pos(0, d / 2 - p.wall - 8, h / 2) * Rot(90, 0, 0) * Cylinder(20, 16), METAL, 1.0),  # スピーカー
