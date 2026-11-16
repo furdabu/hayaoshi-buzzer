@@ -229,7 +229,7 @@ def child_inside(p: enc.Params):
         (Pos(enc.CHILD_POWER_X, wall_y - 14, p.power_button_z) * Rot(90, 0, 0) * Cylinder(9, 28), METAL, 1.0),
         (box_at(5, 18, f, 17, 36, 6), BOOST, 1.0),  # MT3608 (5V)
         (box_at(5, 62, f, 17, 36, 6), BOOST, 1.0),  # MT3608 (12V, ボタン LED 用)
-        (box_at(38, -45, f, 23, 18, 6), BOARD, 1.0),  # ESP32-C3 SuperMini (アンテナを右の壁へ向ける)
+        (box_at(38, -45, f, 21, 17.5, 6), BOARD, 1.0),  # XIAO ESP32C6 (アンテナを右の壁へ向ける)
         (box_at(35.7, 21, f, 33, 51, 5), HUB, 1.0),  # 中継基板 (注文した基板の大きさ 51 x 33mm。ストリップ基板はこれより小さい)
         (Pos(bx, by, h - 40) * Cylinder(15, 40, align=enc.MIN), BUTTON_BODY, 1.0),  # ボタンの胴体
     ]

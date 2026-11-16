@@ -2,8 +2,8 @@
 <title>親機の基板のピン</title>
 <rect width="1180" height="640" fill="#ffffff"/>
 <text x="24.0" y="26.0" font-size="21" fill="#212529" text-anchor="start" font-weight="bold" dominant-baseline="central" >親機: はんだ付けするピン</text>
-<text x="24.0" y="50.0" font-size="14" fill="#495057" text-anchor="start" font-weight="normal" dominant-baseline="central" >部品のある面を上にして見た図。ピンの並びは製品によって違うことがあるので、かならず基板の印字で確かめてください</text>
-<text x="350.0" y="80.0" font-size="15" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >ESP32 開発ボード (38 ピン)</text>
+<text x="24.0" y="50.0" font-size="14" fill="#495057" text-anchor="start" font-weight="normal" dominant-baseline="central" >部品のある面を上にして見た図。ピンの名前は基板に印刷されているので、はんだ付けの前に印字と見くらべてください</text>
+<text x="350.0" y="80.0" font-size="15" fill="#212529" text-anchor="middle" font-weight="bold" dominant-baseline="central" >ESP32-DevKitC-32E (38 ピン)</text>
 <rect x="250.0" y="96.0" width="200.0" height="500.0" rx="8" fill="#2b8a3e" stroke="#1b5e2b" stroke-width="1.6" />
 <rect x="314.0" y="104.0" width="72.0" height="124.0" rx="4" fill="#adb5bd" stroke="#868e96" stroke-width="1.2" />
 <text x="350.0" y="156.0" font-size="12.5" fill="#343a40" text-anchor="middle" font-weight="bold" dominant-baseline="central" >ESP32</text>

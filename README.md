@@ -14,11 +14,11 @@ ESP32 で作る **ワイヤレス早押しクイズボタン** です。
   電池残量も表示します
 - **ボタンが光って状態を知らせる**: 子機は今押せるときだけ、親機は判定待ちのときにボタンが光ります
 - **公平な判定**: 電波が届いた順ではなく「ボタンを押した瞬間の時刻」で判定 ([仕組み](docs/protocol.md))
-- **汎用部品だけ**: ESP32 開発ボード / 60mm アーケードボタン / WS2812B LED / 乳白の半球カバー / DFPlayer Mini / TM1637 4 桁表示
+- **手に入りやすい部品だけ**: 技適のある ESP32 のマイコンボード / 60mm アーケードボタン / WS2812B LED / 乳白の半球カバー / DFPlayer Mini / TM1637 4 桁表示
 - **3D プリント用データつき**: STL (そのまま印刷) と STEP (CAD で編集)、寸法を変えられる Python スクリプト
 - **効果音つき**: 正解「ピンポーン」・不正解「ブッブー」・回答権「ピコーン」を同梱 (自作音源なので自由に使えます)
 - **子機ごとの設定は不要**: 全子機に同じファームウェアを書き込むだけ。番号は親機が自動で割り振ります
-- **パソコンと連携できる (使う人だけ)**: 受信機 (ESP32-C3 SuperMini 1 個) を USB でつなぐと、だれが回答中か・正解か不正解かを
+- **パソコンと連携できる (使う人だけ)**: 受信機 (子機と同じマイコン 1 個) を USB でつなぐと、だれが回答中か・正解か不正解かを
   パソコンでリアルタイムに受け取れます ([PC 連携](docs/pc-link.md))
 
 ## 動き方
@@ -62,7 +62,7 @@ ESP32 で作る **ワイヤレス早押しクイズボタン** です。
 
 | | 子機 (1 台あたり) | 親機 |
 | --- | --- | --- |
-| マイコン | ESP32-C3 SuperMini | ESP32 開発ボード (ESP32-DevKitC など) |
+| マイコン (技適のあるもの) | Seeed Studio XIAO ESP32C6 | Espressif ESP32-DevKitC-32E |
 | ボタン | 60mm 押しボタン (12V LED 付き) x1 | 同じボタン x2 (左: 不正解の青 / 右: 正解の赤) |
 | ランプ | WS2812B 7 連 LED 丸型基板 + 半球カバー (直径 68mm) x1 | 同じもの x1 (中央。正解で赤、不正解で青に光る) |
 | 音 | — | DFPlayer Mini + microSD + スピーカー |
@@ -71,6 +71,9 @@ ESP32 で作る **ワイヤレス早押しクイズボタン** です。
 | 充電 | USB 充電器 + Type-C ケーブル | 同じ |
 | 中継基板 | 専用の基板 (子機用) x1。基板メーカーに注文する | 専用の基板 (親機用) x1 |
 | ケース | 3D プリント 2 パーツ (箱・天板) | 3D プリント 2 パーツ (箱・天板) |
+
+マイコンは **日本の技適があるもの** を国内の販売店で買ってください。海外通販の互換ボード (ESP32-C3 SuperMini など) は、
+技適を確かめられないので使いません ([マイコンと技適](docs/bom.md#マイコンと技適))。
 
 ## 作り方
 
@@ -91,15 +94,15 @@ ESP32 で作る **ワイヤレス早押しクイズボタン** です。
 
 ```bash
 cd firmware
-pio run -e master -t upload     # 親機 (ESP32 DevKit)
-pio run -e child -t upload      # 子機 (ESP32-C3 SuperMini)
+pio run -e master -t upload     # 親機 (ESP32-DevKitC-32E)
+pio run -e child -t upload      # 子機 (XIAO ESP32C6)
 pio run -e receiver -t upload   # PC 連携の受信機 (使う人だけ。docs/pc-link.md)
 ```
 
 子機は全台に同じファームウェアを書き込めば OK です。個別の設定はありません。
 
 - 書き込むときは **電源ボタンを OFF** にしてから、開発ボードに USB ケーブルをつないでください
-- SuperMini が書き込めないときは、基板の **BOOT ボタンを押したまま USB を挿し**、離してから書き込んでください
+- XIAO が書き込めないときは、基板の **BOOT ボタン (USB 端子の右の `B`) を押したまま USB を挿し**、離してから書き込んでください
 シリアルモニタ (`pio device monitor`) を開くと、誰が何 ms で押したかなどのログが見られます。
 
 ## 使い方
@@ -202,6 +205,7 @@ python sounds/generate_sounds.py
 A wireless quiz buzzer system built on ESP32 and ESP-NOW. One master unit supports up to 64 buzzer units, with no Wi-Fi router needed.
 Only the first buzzer pressed lights up. Others are locked out until the host presses *correct* or *incorrect* on the master, which plays a sound, lights the central lamp red (correct) or blue (incorrect), and resets the round.
 Fairness is based on press timestamps synchronised to the master clock, not on radio arrival order.
-Uses generic parts (ESP32 dev board, 60 mm arcade buttons, WS2812B 7-LED boards under 68 mm diffuser covers, DFPlayer Mini, TM1637 4-digit display) and includes 3D-printable enclosures (STL/STEP plus a parametric build123d script).
+Uses easy-to-find parts (ESP32 boards, 60 mm arcade buttons, WS2812B 7-LED boards under 68 mm diffuser covers, DFPlayer Mini, TM1637 4-digit display) and includes 3D-printable enclosures (STL/STEP plus a parametric build123d script).
 Both units run on rechargeable 18650 cells (1 in each buzzer, 3 in parallel in the master) with USB Type-C charging (TP4056), an MT3608 boost converter, a latching power button and battery-level indication.
-Optionally, a spare ESP32-C3 plugged into a PC listens to the master and streams the game state (who buzzed in, correct / incorrect) as JSON lines over USB ([docs/pc-link.md](docs/pc-link.md), not yet tested on hardware).
+The microcontroller boards are ones certified for radio use in Japan (Seeed Studio XIAO ESP32C6 in the buzzers, Espressif ESP32-DevKitC-32E in the master).
+Optionally, a spare XIAO ESP32C6 plugged into a PC listens to the master and streams the game state (who buzzed in, correct / incorrect) as JSON lines over USB ([docs/pc-link.md](docs/pc-link.md), not yet tested on hardware).

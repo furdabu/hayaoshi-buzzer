@@ -138,13 +138,13 @@ CHILD_WIRES = [
     Wire(11, "gnd", ("mt5", "VOUT-"), H(4, "L")),
     Wire(12, "5v", H(9, "R"), ("esp", "5V")),
     Wire(13, "gnd", H(3, "R"), ("esp", "GND")),
-    Wire(14, "sense", ("esp", "1"), H(7, "R")),
-    Wire(15, "data", ("esp", "4"), H(8, "R")),
-    Wire(16, "ctl", ("esp", "5"), H(5, "R")),
+    Wire(14, "sense", ("esp", "D0"), H(7, "R")),
+    Wire(15, "data", ("esp", "D2"), H(8, "R")),
+    Wire(16, "ctl", ("esp", "D3"), H(5, "R")),
     Wire(17, "data", H(11, "R"), ("led", "IN")),
     Wire(18, "led5", H(6, "R"), ("led", "PWR")),
     Wire(19, "gnd", H(3, "R"), ("led", "GND")),
-    Wire(20, "btn", ("esp", "3"), ("btn", "NO")),
+    Wire(20, "btn", ("esp", "D1"), ("btn", "NO")),
     Wire(21, "gnd", H(4, "R"), ("btn", "COM")),
     Wire(22, "12v", ("mt12", "VOUT+"), ("btn", "LED+")),
     Wire(23, "ledk", H(2, "R"), ("btn", "LED-")),
@@ -227,11 +227,11 @@ EXPECTED_CHILD = [
      "Ce.-", "Q.E", "R10k.2", "Rb.2", "Cc.2", "J1.1", "J1.2"},
     {"mt5.VOUT+", "esp.5V", "psw.LED+", "Di.A"},
     {"Di.K", "Ce.+", "led.PWR"},
-    {"esp.4", "R330.1"},
+    {"esp.D2", "R330.1"},
     {"R330.2", "led.IN"},
-    {"esp.3", "btn.NO"},
-    {"Rt.2", "Rb.1", "Cc.1", "esp.1"},
-    {"esp.5", "R1k.1"},
+    {"esp.D1", "btn.NO"},
+    {"Rt.2", "Rb.1", "Cc.1", "esp.D0"},
+    {"esp.D3", "R1k.1"},
     {"R1k.2", "R10k.1", "Q.B"},
     {"Q.C", "btn.LED-"},
     {"mt12.VOUT+", "btn.LED+"},
@@ -650,9 +650,9 @@ def child_pictorial() -> Pictorial:
             [("VIN+", "VIN+"), ("VIN-", "VIN−"), ("VOUT+", "VOUT+"), ("VOUT-", "VOUT−")], "R", "#d9480f"),
     ]
     right = [
-        Mod("esp", "ESP32-C3 SuperMini", "マイコン",
-            [(None, "── 5V がある列 ──"), ("5V", "5V"), ("GND", "G (GND)"), ("4", "4"), ("3", "3"), ("1", "1"),
-             (None, "── 反対の列 ──"), ("5", "5")], "L", "#2b8a3e"),
+        Mod("esp", "XIAO ESP32C6", "マイコン",
+            [(None, "── 右の列 (上から) ──"), ("5V", "5V"), ("GND", "GND"),
+             (None, "── 左の列 (上から) ──"), ("D0", "D0"), ("D1", "D1"), ("D2", "D2"), ("D3", "D3")], "L", "#2b8a3e"),
         Mod("led", "LED 基板", "WS2812B 7 連 (ランプ)", [("IN", "IN"), ("PWR", "PWR"), ("GND", "GND")], "L", "#1864ab"),
         Mod("btn", "アーケードボタン", "60mm",
             [("NO", "スイッチ NO"), ("COM", "スイッチ COM"), ("LED+", "LED ＋"), ("LED-", "LED −")], "L", "#c92a2a"),
@@ -679,9 +679,9 @@ def master_pictorial() -> Pictorial:
         Mod("spk", "スピーカー", "8Ω", [("1", "端子"), ("2", "端子")], "R", "#495057"),
     ]
     right = [
-        Mod("esp", "ESP32 開発ボード", "マイコン (38 ピン)",
+        Mod("esp", "ESP32-DevKitC-32E", "マイコン (38 ピン)",
             [(None, "── 3V3・5V がある列 ──"), ("3V3", "3V3"), ("35", "35"), ("32", "32"), ("33", "33"), ("26", "26"),
-             ("27", "27"), ("GND_A", "GND"), ("5V", "5V (VIN)"),
+             ("27", "27"), ("GND_A", "GND"), ("5V", "5V"),
              (None, "── 反対の列 ──"), ("GND_B", "GND"), ("19", "19"), ("18", "18"), ("17", "17"), ("16", "16")],
             "L", "#2b8a3e"),
         Mod("tm", "TM1637", "4 桁表示", [("CLK", "CLK"), ("DIO", "DIO"), ("VCC", "VCC"), ("GND", "GND")], "L", "#1864ab"),
@@ -942,22 +942,32 @@ def pin_column(s: Svg, x: float, y: float, names: list, used: dict, side: str, g
 
 def draw_pins_child(path: Path) -> None:
     W, Ht = 760, 372
-    s = Svg(W, Ht, "ESP32-C3 SuperMini のピン")
-    s.text(24, 26, "ESP32-C3 SuperMini: はんだ付けするピン", 21, INK, "start", "bold")
-    s.text(24, 50, "部品のある面を上、USB を上にして見た図。左右はかならず基板の印字で確かめてください", 14, "#495057")
-    bx, by, bw, bh = 295, 84, 170, 236
+    s = Svg(W, Ht, "XIAO ESP32C6 のピン")
+    s.text(24, 26, "XIAO ESP32C6: はんだ付けするピン", 21, INK, "start", "bold")
+    s.text(24, 50, "部品のある面を上、USB を上にして見た図。ピンの名前は基板の裏に印刷されています", 14, "#495057")
+    bx, by, bw, bh = 272, 84, 216, 222
+    cx = bx + bw / 2
     s.rect(bx, by, bw, bh, "#2b8a3e", "#1b5e2b", 1.6, 8)
-    s.rect(bx + bw / 2 - 26, by - 12, 52, 34, "#ced4da", "#868e96", 1.3, 5)
-    s.text(bx + bw / 2, by + 5, "USB", 11.5, "#495057", "middle", "bold")
-    s.rect(bx + bw / 2 - 24, by + 98, 48, 48, "#343a40", "#212529", 1, 4)
-    s.text(bx + bw / 2, by + 122, "C3", 11, "#ffffff", "middle", "bold")
-    s.rect(bx + bw / 2 - 12, by + bh - 30, 24, 12, "#e03131", "#a51111", 1, 2)
-    s.text(bx + bw / 2, by + bh - 44, "アンテナ", 11, "#d3f9d8", "middle")
-    used = {"5V": (12, "5v", "5V"), "G": (13, "gnd", "GND"), "4": (15, "data", "LED データ"),
-            "3": (20, "btn", "ボタン NO"), "1": (14, "sense", "電池測定"), "5": (16, "ctl", "ボタン LED 信号")}
-    pin_column(s, bx + 15, by + 34, ["5", "6", "7", "8", "9", "10", "20", "21"], used, "L")
-    pin_column(s, bx + bw - 15, by + 34, ["5V", "G", "3.3", "4", "3", "2", "1", "0"], used, "R")
-    s.text(24, Ht - 22, "黄色の 6 か所だけ使います。丸の数字は線の番号です", 13.5, "#495057")
+    s.rect(cx - 26, by - 12, 52, 34, "#ced4da", "#868e96", 1.3, 5)
+    s.text(cx, by + 5, "USB", 11.5, "#495057", "middle", "bold")
+    # 基板上の LED (USB の右)
+    s.rect(cx + 36, by + 8, 9, 6, "#ffa94d", "#d9480f", 0.8, 1.5)
+    s.text(cx + 40.5, by + 25, "LED", 9.5, "#d3f9d8", "middle")
+    # 金属カバー (技適の番号が印字されている)
+    s.rect(cx - 40, by + 42, 80, 96, "#dee2e6", "#868e96", 1.2, 4)
+    s.text(cx, by + 80, "金属カバー", 11.5, "#343a40", "middle", "bold")
+    s.text(cx, by + 98, "技適の番号が", 9.8, "#495057", "middle")
+    s.text(cx, by + 111, "印字されている", 9.8, "#495057", "middle")
+    # 下の端: 外付けアンテナ用の端子 (使わない) と、基板上のアンテナ
+    s.circle(cx - 24, by + bh - 24, 6.5, "#e9c46a", "#8d6e1f", 1.1)
+    s.rect(cx + 2, by + bh - 29, 36, 10, "#c9b458", "#8d6e1f", 1, 2)
+    s.text(cx + 20, by + bh - 36, "アンテナ", 10.5, "#d3f9d8", "middle")
+    used = {"5V": (12, "5v", "5V"), "GND": (13, "gnd", "GND"), "D0": (14, "sense", "電池測定"),
+            "D1": (20, "btn", "ボタン NO"), "D2": (15, "data", "LED データ"), "D3": (16, "ctl", "ボタン LED 信号")}
+    pin_column(s, bx + 15, by + 34, ["D0", "D1", "D2", "D3", "D4", "D5", "D6"], used, "L")
+    pin_column(s, bx + bw - 15, by + 34, ["5V", "GND", "3V3", "D10", "D9", "D8", "D7"], used, "R")
+    s.text(24, Ht - 22, "黄色の 6 か所だけ使います。丸の数字は線の番号です。下の端の丸い金色の端子 (外付けアンテナ用) は使いません", 13.5,
+           "#495057")
     s.save(path)
 
 
@@ -965,10 +975,10 @@ def draw_pins_master(path: Path) -> None:
     W, Ht = 1180, 640
     s = Svg(W, Ht, "親機の基板のピン")
     s.text(24, 26, "親機: はんだ付けするピン", 21, INK, "start", "bold")
-    s.text(24, 50, "部品のある面を上にして見た図。ピンの並びは製品によって違うことがあるので、かならず基板の印字で確かめてください", 14, "#495057")
-    # ESP32 開発ボード
+    s.text(24, 50, "部品のある面を上にして見た図。ピンの名前は基板に印刷されているので、はんだ付けの前に印字と見くらべてください", 14, "#495057")
+    # ESP32-DevKitC-32E
     bx, by, bw, bh = 250, 96, 200, 500
-    s.text(bx + bw / 2, by - 16, "ESP32 開発ボード (38 ピン)", 15, INK, "middle", "bold")
+    s.text(bx + bw / 2, by - 16, "ESP32-DevKitC-32E (38 ピン)", 15, INK, "middle", "bold")
     s.rect(bx, by, bw, bh, "#2b8a3e", "#1b5e2b", 1.6, 8)
     s.rect(bx + 64, by + 8, bw - 128, 124, "#adb5bd", "#868e96", 1.2, 4)
     s.text(bx + bw / 2, by + 60, "ESP32", 12.5, "#343a40", "middle", "bold")
@@ -1012,7 +1022,7 @@ def draw_pins_master(path: Path) -> None:
 # ============================================================================
 #  手順書の表 (図と同じデータから作る)
 # ============================================================================
-SHORT_NAME = {"esp": {"ESP32-C3 SuperMini": "SuperMini", "ESP32 開発ボード": "ESP32"}}
+SHORT_NAME = {"esp": {"XIAO ESP32C6": "XIAO", "ESP32-DevKitC-32E": "ESP32"}}
 TOP_PLATE = {"led", "btn", "ok", "ng"}  # 天板に付く部品。天板を開けられるように線を長くする
 
 
