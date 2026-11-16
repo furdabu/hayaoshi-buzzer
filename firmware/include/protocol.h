@@ -5,6 +5,7 @@
 //   親機 -> 全子機 (broadcast) : StatePacket を 100ms ごと + 状態変化時に連続送信
 //   子機 -> 親機   (unicast)   : PressPacket (ボタン押下), HelloPacket (生存通知)
 //   親機 -> 全子機 (broadcast) : AssignPacket (子機番号の通知)
+//   親機 -> 受信機 (broadcast) : InfoPacket (PC 連携用の追加情報。子機は読み飛ばす)
 #pragma once
 
 #include <stdint.h>
@@ -20,6 +21,7 @@ enum class MsgType : uint8_t {
   Press = 2,
   Hello = 3,
   Assign = 4,
+  Info = 5,
 };
 
 enum class RoundState : uint8_t {
@@ -38,6 +40,9 @@ constexpr uint8_t kFlagRegisterMode = 0x01;  // 番号登録モード中
 
 // AssignPacket.flags
 constexpr uint8_t kAssignFlash = 0x01;  // 子機のランプを光らせて登録完了を知らせる
+
+// InfoPacket.flags
+constexpr uint8_t kInfoMasterBatteryLow = 0x01;  // 親機の電池残量わずか
 
 struct __attribute__((packed)) Header {
   uint32_t magic;
@@ -88,7 +93,25 @@ struct __attribute__((packed)) AssignPacket {
   uint8_t flags;
 };
 
+// 親機 -> 全体 (broadcast)。PC 連携の受信機 (docs/pc-link.md) に向けた追加情報。
+// 1 秒ごと + 回答者が決まったときに送る。子機はこのパケットを使わない。
+struct __attribute__((packed)) InfoPacket {
+  Header h;
+  uint32_t bootId;            // StatePacket と同じ値
+  uint8_t registered;         // 登録済みの子機の台数
+  uint8_t connected;          // 接続中の子機の台数
+  uint8_t masterBattery20mV;  // 親機の電池電圧 (20mV 単位, 0 = 電池なし / 不明)
+  uint8_t flags;
+  uint64_t connectedMask;     // ビット (番号 - 1) が 1 = その番号の子機が接続中 (64 番まで)
+  uint64_t lowBatteryMask;    // ビット (番号 - 1) が 1 = その番号の子機が電池残量わずか
+  uint16_t buzzRound;         // 直近に回答者が決まったラウンド (0 = まだない)
+  uint8_t buzzId;             // その回答者の番号
+  uint8_t buzzCandidates;     // そのとき、ほぼ同時に押していた子機の数 (回答者を含む)
+  uint32_t buzzElapsedMs;     // 受付開始から回答者がボタンを押すまでの時間 (ms)
+};
+
 constexpr size_t kMaxPacketSize = sizeof(StatePacket);
+static_assert(sizeof(InfoPacket) <= kMaxPacketSize, "受信バッファに入る大きさにすること");
 
 inline void fillHeader(Header& h, MsgType type, uint8_t group) {
   h.magic = kMagic;

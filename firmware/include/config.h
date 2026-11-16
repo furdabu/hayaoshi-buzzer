@@ -7,7 +7,7 @@
 #pragma once
 
 #define FW_VERSION_MAJOR 1
-#define FW_VERSION_MINOR 0
+#define FW_VERSION_MINOR 1
 
 // ---------------------------------------------------------------------------
 //  無線 (ESP-NOW)
@@ -99,8 +99,8 @@
 #define BATTERY_CUTOFF_MV 3200
 #endif
 
-// 無線の送信出力。ESP32-C3 SuperMini の一部の個体は最大出力だと通信が不安定になるので、
-// その場合は platformio.ini の build_flags に -DWIFI_TX_POWER=WIFI_POWER_8_5dBm などを足す
+// 無線の送信出力。通信が不安定なときに下げて試せる:
+// platformio.ini の build_flags に -DWIFI_TX_POWER=WIFI_POWER_8_5dBm などを足す
 // (未定義なら最大出力のまま)
 
 // ---------------------------------------------------------------------------
@@ -118,29 +118,32 @@
 // ---------------------------------------------------------------------------
 //  ピン配置
 // ---------------------------------------------------------------------------
-#if defined(BOARD_C3_SUPERMINI)
-// --- 子機: ESP32-C3 SuperMini ---
+#if defined(BOARD_XIAO_ESP32C6)
+// --- 子機・PC 連携の受信機: Seeed Studio XIAO ESP32C6 ---
+// 番号は GPIO 番号。かっこの中は基板のピンの名前 (D0〜D3 は USB を上にして左の列の上から 4 本)
+#ifndef PIN_BATTERY
+#define PIN_BATTERY 0  // (D0) 電池電圧 (分圧) の入力。アナログ入力ができるのは D0〜D2 だけ
+#endif
 #ifndef PIN_BUTTON
-#define PIN_BUTTON 3
+#define PIN_BUTTON 1  // (D1)
 #endif
 #ifndef PIN_LAMP
-#define PIN_LAMP 4
+#define PIN_LAMP 2  // (D2)
 #endif
 #ifndef PIN_BUTTON_LED
-#define PIN_BUTTON_LED 5  // ボタン内蔵 LED (12V, トランジスタ経由)。使わないなら -1
+#define PIN_BUTTON_LED 21  // (D3) ボタン内蔵 LED (12V, トランジスタ経由)。使わないなら -1
 #endif
 #ifndef PIN_STATUS_LED
-#define PIN_STATUS_LED 8
-#endif
-#ifndef PIN_BATTERY
-#define PIN_BATTERY 1  // 電池電圧 (分圧) の入力
+#define PIN_STATUS_LED 15  // 基板上の LED (USB 端子の横)
 #endif
 #ifndef STATUS_LED_ACTIVE_LOW
-#define STATUS_LED_ACTIVE_LOW 1
+#define STATUS_LED_ACTIVE_LOW 1  // 点灯と消灯が逆になる場合は 0 にする
 #endif
+// GPIO3 と GPIO14 は基板の中でアンテナの切り替えに使われている (起動時に基板上のアンテナが選ばれる)。
+// GPIO16 (D6) は起動時にメッセージが出るので、LED などの出力には使わないこと
 
 #else
-// --- 親機: ESP32 DevKitC (ESP32-WROOM-32) ---
+// --- 親機: ESP32-DevKitC-32E (ESP32-WROOM-32E) ---
 #ifndef PIN_BTN_CORRECT
 #define PIN_BTN_CORRECT 32
 #endif
@@ -169,7 +172,7 @@
 #define PIN_BATTERY 35  // 電池電圧 (分圧) の入力。ADC1 のピンであること (無線使用中は ADC2 が使えない)
 #endif
 #ifndef PIN_STATUS_LED
-#define PIN_STATUS_LED 2
+#define PIN_STATUS_LED 2  // 純正の ESP32-DevKitC-32E には LED が付いていない (LED を足す場合の出力)
 #endif
 #ifndef STATUS_LED_ACTIVE_LOW
 #define STATUS_LED_ACTIVE_LOW 0
@@ -185,6 +188,7 @@
 #define MASTER_TIMEOUT_MS 1500     // これだけ親機から届かなければ「未接続」
 #define HELLO_INTERVAL_MS 1000     // 子機の生存通知間隔
 #define CHILD_TIMEOUT_MS 3500      // これだけ子機から届かなければ接続数から外す
+#define INFO_INTERVAL_MS 1000      // 親機が PC 連携用の追加情報を送る間隔
 #define PRESS_RETRIES 4            // 押下パケットの再送回数
 #define PRESS_RETRY_MS 15          // 押下パケットの再送間隔
 #define EARLY_TOLERANCE_MS 5       // 受付開始より前の押下として捨てるまでの許容誤差

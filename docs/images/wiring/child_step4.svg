@@ -14,12 +14,12 @@
 <path d="M666.0,407.0 L697.0,407.0 Q704.0,407.0 704.0,414.0 L704.0,817.0 Q704.0,824.0 711.0,824.0 L924.0,824.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
 <path d="M220.0,768.0 L377.0,768.0 Q384.0,768.0 384.0,761.0 L384.0,582.0 Q384.0,575.0 391.0,575.0 L436.0,575.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
 <path d="M220.0,796.0 L363.0,796.0 Q370.0,796.0 370.0,789.0 L370.0,414.0 Q370.0,407.0 377.0,407.0 L436.0,407.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-<path d="M666.0,589.0 L725.0,589.0 Q732.0,589.0 732.0,582.0 L732.0,165.0 Q732.0,158.0 739.0,158.0 L924.0,158.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+<path d="M666.0,589.0 L739.0,589.0 Q746.0,589.0 746.0,582.0 L746.0,165.0 Q746.0,158.0 753.0,158.0 L924.0,158.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
 <path d="M666.0,351.0 L711.0,351.0 Q718.0,351.0 718.0,344.0 L718.0,193.0 Q718.0,186.0 725.0,186.0 L924.0,186.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-<path d="M924.0,270.0 L753.0,270.0 Q746.0,270.0 746.0,277.0 L746.0,512.0 Q746.0,519.0 739.0,519.0 L666.0,519.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-<path d="M924.0,214.0 L767.0,214.0 Q760.0,214.0 760.0,221.0 L760.0,540.0 Q760.0,547.0 753.0,547.0 L666.0,547.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+<path d="M924.0,242.0 L739.0,242.0 Q732.0,242.0 732.0,249.0 L732.0,512.0 Q732.0,519.0 725.0,519.0 L666.0,519.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+<path d="M924.0,298.0 L767.0,298.0 Q760.0,298.0 760.0,305.0 L760.0,540.0 Q760.0,547.0 753.0,547.0 L666.0,547.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
 <path d="M924.0,326.0 L837.0,326.0 Q830.0,326.0 830.0,333.0 L830.0,456.0 Q830.0,463.0 823.0,463.0 L666.0,463.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-<path d="M924.0,242.0 L893.0,242.0 Q886.0,242.0 886.0,249.0 L886.0,595.0 Q886.0,602.0 893.0,602.0 L924.0,602.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+<path d="M924.0,270.0 L893.0,270.0 Q886.0,270.0 886.0,277.0 L886.0,595.0 Q886.0,602.0 893.0,602.0 L924.0,602.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
 <path d="M666.0,435.0 L781.0,435.0 Q788.0,435.0 788.0,442.0 L788.0,623.0 Q788.0,630.0 795.0,630.0 L924.0,630.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
 <path d="M924.0,852.0 L879.0,852.0 Q872.0,852.0 872.0,845.0 L872.0,665.0 Q872.0,658.0 879.0,658.0 L924.0,658.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
 <path d="M666.0,323.0 L809.0,323.0 Q816.0,323.0 816.0,330.0 L816.0,679.0 Q816.0,686.0 823.0,686.0 L924.0,686.0" fill="none" stroke="#dee2e6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
@@ -71,22 +71,22 @@
 <text x="206.0" y="796.5" font-size="14.5" fill="#868e96" text-anchor="end" font-weight="normal" dominant-baseline="central" >VOUT−</text>
 <rect x="924.0" y="64.0" width="214.0" height="284.0" rx="8" fill="#f8f9fa" stroke="#adb5bd" stroke-width="1.6" />
 <path d="M924.0,108.0 v-36 a8,8 0 0 1 8,-8 h198.0 a8,8 0 0 1 8,8 v36 z" fill="#adb5bd" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round" />
-<text x="1031.0" y="81.0" font-size="15.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >ESP32-C3 SuperMini</text>
+<text x="1031.0" y="81.0" font-size="15.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >XIAO ESP32C6</text>
 <text x="1031.0" y="99.0" font-size="12" fill="#f1f3f5" text-anchor="middle" font-weight="normal" dominant-baseline="central" >マイコン</text>
-<text x="1031.0" y="132.0" font-size="11.5" fill="#868e96" text-anchor="middle" font-weight="normal" dominant-baseline="central" >── 5V がある列 ──</text>
+<text x="1031.0" y="132.0" font-size="11.5" fill="#868e96" text-anchor="middle" font-weight="normal" dominant-baseline="central" >── 右の列 (上から) ──</text>
 <rect x="918.0" y="152.0" width="12.0" height="12.0" rx="2" fill="#dee2e6" stroke="#adb5bd" stroke-width="1.2" />
 <text x="938.0" y="158.5" font-size="14.5" fill="#868e96" text-anchor="start" font-weight="normal" dominant-baseline="central" >5V</text>
 <rect x="918.0" y="180.0" width="12.0" height="12.0" rx="2" fill="#dee2e6" stroke="#adb5bd" stroke-width="1.2" />
-<text x="938.0" y="186.5" font-size="14.5" fill="#868e96" text-anchor="start" font-weight="normal" dominant-baseline="central" >G (GND)</text>
-<rect x="918.0" y="208.0" width="12.0" height="12.0" rx="2" fill="#dee2e6" stroke="#adb5bd" stroke-width="1.2" />
-<text x="938.0" y="214.5" font-size="14.5" fill="#868e96" text-anchor="start" font-weight="normal" dominant-baseline="central" >4</text>
+<text x="938.0" y="186.5" font-size="14.5" fill="#868e96" text-anchor="start" font-weight="normal" dominant-baseline="central" >GND</text>
+<text x="1031.0" y="216.0" font-size="11.5" fill="#868e96" text-anchor="middle" font-weight="normal" dominant-baseline="central" >── 左の列 (上から) ──</text>
 <rect x="918.0" y="236.0" width="12.0" height="12.0" rx="2" fill="#dee2e6" stroke="#adb5bd" stroke-width="1.2" />
-<text x="938.0" y="242.5" font-size="14.5" fill="#868e96" text-anchor="start" font-weight="normal" dominant-baseline="central" >3</text>
+<text x="938.0" y="242.5" font-size="14.5" fill="#868e96" text-anchor="start" font-weight="normal" dominant-baseline="central" >D0</text>
 <rect x="918.0" y="264.0" width="12.0" height="12.0" rx="2" fill="#dee2e6" stroke="#adb5bd" stroke-width="1.2" />
-<text x="938.0" y="270.5" font-size="14.5" fill="#868e96" text-anchor="start" font-weight="normal" dominant-baseline="central" >1</text>
-<text x="1031.0" y="300.0" font-size="11.5" fill="#868e96" text-anchor="middle" font-weight="normal" dominant-baseline="central" >── 反対の列 ──</text>
+<text x="938.0" y="270.5" font-size="14.5" fill="#868e96" text-anchor="start" font-weight="normal" dominant-baseline="central" >D1</text>
+<rect x="918.0" y="292.0" width="12.0" height="12.0" rx="2" fill="#dee2e6" stroke="#adb5bd" stroke-width="1.2" />
+<text x="938.0" y="298.5" font-size="14.5" fill="#868e96" text-anchor="start" font-weight="normal" dominant-baseline="central" >D2</text>
 <rect x="918.0" y="320.0" width="12.0" height="12.0" rx="2" fill="#dee2e6" stroke="#adb5bd" stroke-width="1.2" />
-<text x="938.0" y="326.5" font-size="14.5" fill="#868e96" text-anchor="start" font-weight="normal" dominant-baseline="central" >5</text>
+<text x="938.0" y="326.5" font-size="14.5" fill="#868e96" text-anchor="start" font-weight="normal" dominant-baseline="central" >D3</text>
 <rect x="924.0" y="370.0" width="214.0" height="144.0" rx="8" fill="#f8f9fa" stroke="#1864ab" stroke-width="1.6" />
 <path d="M924.0,414.0 v-36 a8,8 0 0 1 8,-8 h198.0 a8,8 0 0 1 8,8 v36 z" fill="#1864ab" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round" />
 <text x="1031.0" y="387.0" font-size="15.5" fill="#ffffff" text-anchor="middle" font-weight="bold" dominant-baseline="central" >LED 基板</text>

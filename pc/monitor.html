@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>早押しボタン モニター</title>
+<!--
+  早押しボタンの状態を PC で見るページ (docs/pc-link.md)。
+  PC 連携の受信機 (XIAO ESP32C6) を USB でつなぎ、Chrome か Edge でこのファイルを開いて使う。
+  ほかのファイルやインターネット接続は不要。
+
+  受信機から届く 1 行ずつの JSON を handleLine() に渡すと、画面が変わる。
+  自分のページを作るときは、このファイルの「受信したデータを画面の状態に直す」の所を参考にしてください。
+-->
+<style>
+  :root {
+    --bg: #f4f2ee;
+    --panel: #ffffff;
+    --line: #dcd8d0;
+    --text: #1d1b18;
+    --muted: #6d675e;
+    --accent: #1d1b18;
+    --answer: #e96a00;      /* 回答中 (子機のランプと同じオレンジ) */
+    --correct: #d81e1e;     /* 正解 (親機のランプと同じ赤) */
+    --incorrect: #1257e0;   /* 不正解 (親機のランプと同じ青) */
+    --warn: #b25b00;
+    --ok: #1c7c3c;
+    --stage-bg: #1d1b18;
+    --stage-text: #ffffff;
+    --stage-muted: #b9b3a8;
+    --correct-bg: #c81414;    /* 大きな表示の背景 (白い文字が読める濃さ) */
+    --incorrect-bg: #0f4fd6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141312;
+      --panel: #1e1c1a;
+      --line: #35312c;
+      --text: #f1eee8;
+      --muted: #a39c90;
+      --accent: #f1eee8;
+      --answer: #ff8a1f;
+      --correct: #ff4d4d;
+      --incorrect: #4d8dff;
+      --warn: #ffb04d;
+      --ok: #55c57a;
+      --stage-bg: #000000;
+      --stage-text: #ffffff;
+      --stage-muted: #a39c90;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", "Meiryo", "Noto Sans JP", sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 16px; }
+
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 14px; }
+  h1 { font-size: 18px; margin: 0; font-weight: 700; letter-spacing: .02em; }
+  .spacer { flex: 1 1 auto; }
+  button {
+    font: inherit; color: var(--text); background: var(--panel);
+    border: 1px solid var(--line); border-radius: 8px; padding: 7px 14px; cursor: pointer;
+  }
+  button:hover { border-color: var(--muted); }
+  button:focus-visible { outline: 2px solid var(--incorrect); outline-offset: 2px; }
+  button.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 700; }
+  button:disabled { opacity: .5; cursor: default; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px;
+    background: var(--panel); font-size: 13px; color: var(--muted); white-space: nowrap;
+  }
+  .chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+  .chip.on { color: var(--text); }
+  .chip.on::before { background: var(--ok); }
+  .chip.wait::before { background: var(--warn); }
+
+  /* ---- 大きな表示 ---- */
+  .stage {
+    background: var(--stage-bg); color: var(--stage-text);
+    border-radius: 16px; padding: 28px 20px; text-align: center;
+    min-height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border: 6px solid transparent; transition: border-color .15s, background-color .15s;
+  }
+  .stage .label { font-size: clamp(20px, 3.4vw, 34px); font-weight: 700; letter-spacing: .08em; }
+  .stage .big {
+    font-size: clamp(96px, 22vw, 220px); font-weight: 800; line-height: 1;
+    font-variant-numeric: tabular-nums; margin: 6px 0 2px;
+  }
+  .stage .big small { font-size: .28em; font-weight: 700; margin-left: .12em; }
+  .stage .sub { font-size: clamp(14px, 1.8vw, 18px); color: var(--stage-muted); min-height: 1.6em; }
+  .stage.answer { border-color: var(--answer); }
+  .stage.answer .label { color: var(--answer); }
+  .stage.correct { background: var(--correct-bg); }
+  .stage.incorrect { background: var(--incorrect-bg); }
+  .stage.correct .sub, .stage.incorrect .sub { color: rgba(255, 255, 255, .85); }
+  .stage.idle .label { color: var(--stage-muted); font-weight: 600; letter-spacing: .04em; }
+
+  h2 { font-size: 14px; margin: 22px 0 8px; color: var(--muted); font-weight: 700; letter-spacing: .04em; }
+  .head-row { display: flex; align-items: baseline; gap: 12px; }
+  .head-row .note { font-size: 13px; color: var(--muted); }
+  .head-row button { padding: 3px 10px; font-size: 13px; }
+
+  /* ---- 子機 ---- */
+  .units { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+  .unit {
+    background: var(--panel); border: 2px solid var(--line); border-radius: 10px; padding: 8px 10px;
+    font-variant-numeric: tabular-nums;
+  }
+  .unit .num { font-size: 26px; font-weight: 800; line-height: 1.1; }
+  .unit .num small { font-size: 12px; font-weight: 600; color: var(--muted); margin-left: 2px; }
+  .unit .tally { font-size: 13px; color: var(--muted); }
+  .unit .tally b { color: var(--text); font-weight: 700; }
+  .unit .flag { font-size: 12px; min-height: 1.6em; color: var(--muted); }
+  .unit .flag.low { color: var(--warn); font-weight: 700; }
+  .unit.off { opacity: .45; }
+  .unit.answer { border-color: var(--answer); }
+  .unit.correct { border-color: var(--correct); }
+  .unit.incorrect { border-color: var(--incorrect); }
+  .empty { color: var(--muted); font-size: 14px; margin: 0; grid-column: 1 / -1; }
+
+  /* ---- 記録 ---- */
+  .log {
+    list-style: none; margin: 0; padding: 0; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 10px; max-height: 260px; overflow-y: auto;
+  }
+  .log li { padding: 5px 12px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; }
+  .log li:last-child { border-bottom: 0; }
+  .log time { color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
+  .log .c { color: var(--correct); font-weight: 700; }
+  .log .i { color: var(--incorrect); font-weight: 700; }
+  .log .a { color: var(--answer); font-weight: 700; }
+
+  details { margin-top: 18px; }
+  summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+  pre {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+    max-height: 240px; overflow: auto; font-size: 12px; line-height: 1.5; margin: 8px 0 0;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; white-space: pre-wrap; word-break: break-all;
+  }
+  .message { margin: 10px 0 0; font-size: 14px; color: var(--warn); min-height: 1.6em; }
+  footer { margin-top: 20px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>早押しボタン モニター</h1>
+    <div class="chips">
+      <span class="chip" id="chipReceiver">受信機: 未接続</span>
+      <span class="chip" id="chipMaster">親機: —</span>
+      <span class="chip" id="chipCount">子機: —</span>
+    </div>
+    <div class="spacer"></div>
+    <button id="btnDemo" type="button">デモを再生</button>
+    <button id="btnConnect" type="button" class="primary">受信機につなぐ</button>
+  </header>
+
+  <section class="stage idle" id="stage" aria-live="polite">
+    <div class="label" id="stageLabel">受信機につないでください</div>
+    <div class="big" id="stageBig" hidden></div>
+    <div class="sub" id="stageSub">右上の「受信機につなぐ」を押して、受信機のポートを選びます</div>
+  </section>
+  <p class="message" id="message" role="status"></p>
+
+  <div class="head-row">
+    <h2>子機</h2>
+    <span class="note">○ 正解 / × 不正解 の回数 (このページを開いてからの集計)</span>
+    <button id="btnReset" type="button">集計をリセット</button>
+  </div>
+  <div class="units" id="units"><p class="empty">まだ情報が届いていません</p></div>
+
+  <h2>記録</h2>
+  <ul class="log" id="log"><li><time>--:--:--</time><span>まだ何もありません</span></li></ul>
+
+  <details>
+    <summary>受信したデータ (受信機から届いた行をそのまま表示)</summary>
+    <pre id="raw"></pre>
+  </details>
+
+  <footer id="footer">Chrome か Edge で開いてください (Web Serial を使います)。</footer>
+</div>
+
+<script>
+"use strict";
+
+// ============================================================================
+//  画面の状態
+// ============================================================================
+const JUDGE_SHOW_MS = 5000;  // 正解 / 不正解を大きく表示しておく時間 (親機のランプと同じ)
+
+const S = {
+  source: null,        // null = 未接続, "serial" = 受信機, "demo" = デモ
+  hello: null,         // 受信機の自己紹介
+  master: null,        // true = 親機の電波を受信中, false = 探している, null = まだ分からない
+  phase: null,         // "open" / "locked" / "register"
+  round: 0,
+  winner: 0,           // 回答中の子機の番号 (0 = なし, null = 番号が分からない)
+  buzz: null,          // 直近の回答者 { round, id, elapsedMs }
+  judged: null,        // 直近の判定 { round, id, result, until }
+  info: null,          // 子機の接続・電池など
+  tally: new Map(),    // 番号 -> { correct, incorrect }
+};
+
+// ============================================================================
+//  受信したデータを画面の状態に直す
+//  line = 受信機から届いた 1 行 (JSON)。形式は docs/pc-link.md
+// ============================================================================
+function handleLine(line) {
+  line = line.trim();
+  if (!line.startsWith("{")) return;  // 起動時のメッセージなど、JSON でない行は読み飛ばす
+  let m;
+  try {
+    m = JSON.parse(line);
+  } catch (e) {
+    return;  // 途中で切れた行
+  }
+  addRaw(line);
+
+  switch (m.type) {
+    case "hello":
+      S.hello = m;
+      break;
+
+    case "master":
+      if (S.master !== m.connected || m.restarted) {
+        addLog(m.connected ? (m.restarted ? "親機が再起動しました" : "親機が見つかりました")
+                           : "親機の電波が届かなくなりました");
+      }
+      S.master = m.connected;
+      if (m.restarted) { S.buzz = null; S.judged = null; S.info = null; }
+      break;
+
+    case "state":  // 今の状態 (1 秒ごと、と出来事のたびに届く)
+      S.master = m.master;
+      if (m.master) {
+        S.phase = m.phase;
+        S.round = m.round;
+        S.winner = m.winner;
+      }
+      break;
+
+    case "buzz":  // 回答者が決まった
+      S.phase = "locked";
+      S.round = m.round;
+      S.winner = m.id;
+      S.buzz = { round: m.round, id: m.id, elapsedMs: null };
+      S.judged = null;
+      mergeBuzzDetail();
+      addLog(`<span class="a">${idText(m.id)}</span> が回答権を獲得`);
+      break;
+
+    case "judge": {  // 正解 / 不正解が押された
+      const ok = m.result === "correct";
+      S.judged = { round: m.round, id: m.id, result: m.result, until: Date.now() + JUDGE_SHOW_MS };
+      if (m.id) {
+        const t = S.tally.get(m.id) || { correct: 0, incorrect: 0 };
+        if (ok) t.correct += 1; else t.incorrect += 1;
+        S.tally.set(m.id, t);
+      }
+      const who = m.id === 0 ? "回答者なし" : idText(m.id);
+      addLog(`${who}: <span class="${ok ? "c" : "i"}">${ok ? "正解" : "不正解"}</span>`);
+      break;
+    }
+
+    case "open":  // 次の受付が始まった
+      S.phase = "open";
+      S.round = m.round;
+      S.winner = 0;
+      break;
+
+    case "register":
+      S.phase = m.active ? "register" : "open";
+      addLog(m.active ? "番号登録モードに入りました" : "番号登録モードが終わりました");
+      break;
+
+    case "info":  // 子機の接続・電池、直近の回答者がボタンを押すまでの時間
+      S.info = m;
+      mergeBuzzDetail();
+      break;
+
+    case "error":
+      addLog(`受信機のエラー: ${escapeHtml(String(m.message))}`);
+      break;
+  }
+  render();
+}
+
+// 「押すまでの時間」は回答者決定の知らせより少し遅れて届くので、同じラウンドなら書き足す
+function mergeBuzzDetail() {
+  const b = S.info && S.info.buzz;
+  if (b && S.buzz && b.round === S.buzz.round && S.buzz.elapsedMs === null) {
+    S.buzz.elapsedMs = b.elapsedMs;
+    S.buzz.candidates = b.candidates;
+  }
+}
+
+// ============================================================================
+//  表示
+// ============================================================================
+const $ = (id) => document.getElementById(id);
+
+function idText(id) { return id === null || id === undefined ? "番号不明の子機" : `${id} 番`; }
+function seconds(ms) { return (ms / 1000).toFixed(2) + " 秒"; }
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function setStage(kind, label, big, sub) {
+  $("stage").className = "stage " + kind;
+  $("stageLabel").textContent = label;
+  const b = $("stageBig");
+  b.hidden = big === null;
+  b.innerHTML = big === null ? "" : big;
+  $("stageSub").textContent = sub || "";
+}
+
+function bigNumber(id) { return id === null || id === undefined ? "?" : `${id}<small>番</small>`; }
+
+function render() {
+  const now = Date.now();
+  if (S.judged && now >= S.judged.until) S.judged = null;
+
+  // ---- 上の小さな表示 ----
+  const cr = $("chipReceiver");
+  cr.textContent = S.source === "serial" ? "受信機: 接続中" : S.source === "demo" ? "デモを再生中" : "受信機: 未接続";
+  cr.className = "chip" + (S.source ? " on" : "");
+  const cm = $("chipMaster");
+  cm.textContent = !S.source || S.master === null ? "親機: —" : S.master ? "親機: 受信中" : "親機: 探しています";
+  cm.className = "chip" + (S.source && S.master ? " on" : S.source && S.master === false ? " wait" : "");
+  const cc = $("chipCount");
+  cc.textContent = S.info && S.master ? `子機: ${S.info.connected} / ${S.info.registered} 台` : "子機: —";
+  cc.className = "chip" + (S.info && S.master ? " on" : "");
+
+  // ---- 大きな表示 ----
+  if (!S.source) {
+    setStage("idle", "受信機につないでください", null, "右上の「受信機につなぐ」を押して、受信機のポートを選びます");
+  } else if (S.master !== true) {
+    setStage("idle", "親機を探しています", null, "親機の電源が入っているか、近くにあるかを確かめてください");
+  } else if (S.phase === "register") {
+    setStage("idle", "番号登録モード", null, "子機のボタンを番号順に押してください");
+  } else if (S.phase === "locked") {
+    const b = S.buzz && S.buzz.round === S.round ? S.buzz : null;
+    let sub = "";
+    if (b && b.elapsedMs !== null) {
+      sub = `受付開始から ${seconds(b.elapsedMs)}`;
+      if (b.candidates > 1) sub += ` / ほぼ同時に ${b.candidates} 台`;
+    }
+    setStage("answer", "回答中", bigNumber(S.winner), sub);
+  } else if (S.judged) {
+    const ok = S.judged.result === "correct";
+    setStage(ok ? "correct" : "incorrect", ok ? "正解" : "不正解",
+             S.judged.id === 0 ? null : bigNumber(S.judged.id), S.judged.id === 0 ? "回答者なし" : "");
+  } else {
+    setStage("idle", "受付中", null, "");
+  }
+
+  // ---- 子機 ----
+  const units = $("units");
+  const ids = new Set(S.tally.keys());
+  const registered = S.info ? S.info.registered : 0;
+  for (let id = 1; id <= registered; id++) ids.add(id);
+  if (S.phase === "locked" && S.winner) ids.add(S.winner);
+  if (ids.size === 0) {
+    units.innerHTML = '<p class="empty">まだ情報が届いていません</p>';
+  } else {
+    const online = new Set(S.info ? S.info.ids : []);
+    const low = new Set(S.info ? S.info.lowBattery : []);
+    const html = [...ids].sort((a, b) => a - b).map((id) => {
+      const t = S.tally.get(id) || { correct: 0, incorrect: 0 };
+      const cls = ["unit"];
+      if (S.info && S.master && !online.has(id)) cls.push("off");
+      if (S.phase === "locked" && S.winner === id) cls.push("answer");
+      else if (S.judged && S.judged.id === id) cls.push(S.judged.result === "correct" ? "correct" : "incorrect");
+      let flag = "";
+      let flagCls = "flag";
+      if (S.info && S.master && !online.has(id)) flag = "未接続";
+      else if (low.has(id)) { flag = "電池わずか"; flagCls += " low"; }
+      return `<div class="${cls.join(" ")}"><div class="num">${id}<small>番</small></div>` +
+             `<div class="tally">○ <b>${t.correct}</b>　× <b>${t.incorrect}</b></div>` +
+             `<div class="${flagCls}">${flag}</div></div>`;
+    }).join("");
+    units.innerHTML = html;
+  }
+
+  // ---- 下の説明 ----
+  const parts = [];
+  if (S.hello) parts.push(`受信機 FW ${S.hello.fw} / チャンネル ${S.hello.channel} / グループ ${S.hello.group}`);
+  if (S.info && S.info.masterBattery) {
+    parts.push(`親機の電池 ${(S.info.masterBattery.mv / 1000).toFixed(2)} V${S.info.masterBattery.low ? " (残量わずか)" : ""}`);
+  }
+  if (S.master && S.round) parts.push(`ラウンド ${S.round}`);
+  $("footer").textContent = parts.length ? parts.join("　・　") : "Chrome か Edge で開いてください (Web Serial を使います)。";
+}
+
+let logEmpty = true;
+function addLog(html) {
+  const log = $("log");
+  if (logEmpty) { log.innerHTML = ""; logEmpty = false; }
+  const li = document.createElement("li");
+  const time = new Date().toLocaleTimeString("ja-JP", { hour12: false });
+  li.innerHTML = `<time>${time}</time><span>${html}</span>`;
+  log.prepend(li);
+  while (log.children.length > 200) log.lastChild.remove();
+}
+
+const rawLines = [];
+function addRaw(line) {
+  rawLines.push(line);
+  if (rawLines.length > 200) rawLines.shift();
+  $("raw").textContent = rawLines.join("\n");
+}
+
+function setMessage(text) { $("message").textContent = text || ""; }
+
+function resetSession() {
+  S.hello = null; S.master = null; S.phase = null; S.round = 0; S.winner = 0;
+  S.buzz = null; S.judged = null; S.info = null;
+}
+
+// ============================================================================
+//  受信機 (Web Serial)
+// ============================================================================
+let port = null;
+let reader = null;
+
+async function openPort(p) {
+  stopDemo();
+  await p.open({ baudRate: 115200 });
+  port = p;
+  resetSession();
+  S.source = "serial";
+  setMessage("");
+  $("btnConnect").textContent = "切断する";
+  addLog("受信機につなぎました");
+  render();
+
+  // "?" を送ると、受信機が今の状態をすぐに送り直してくれる
+  try {
+    const w = p.writable.getWriter();
+    await w.write(new TextEncoder().encode("?\n"));
+    w.releaseLock();
+  } catch (e) { /* 送れなくても、1 秒ごとの状態は届く */ }
+
+  readLoop(p);
+}
+
+async function readLoop(p) {
+  const decoder = new TextDecoder();
+  let buffer = "";
+  try {
+    reader = p.readable.getReader();
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      let nl;
+      while ((nl = buffer.indexOf("\n")) >= 0) {
+        handleLine(buffer.slice(0, nl));
+        buffer = buffer.slice(nl + 1);
+      }
+      if (buffer.length > 4096) buffer = "";  // 改行が来ないおかしなデータは捨てる
+    }
+  } catch (e) {
+    setMessage("受信機との接続が切れました。USB ケーブルを確かめて、もう一度つないでください");
+  } finally {
+    try { reader.releaseLock(); } catch (e) { /* すでに外れている */ }
+    reader = null;
+    try { await p.close(); } catch (e) { /* すでに閉じている */ }
+    if (port === p) {
+      port = null;
+      if (S.source === "serial") {
+        S.source = null;
+        addLog("受信機との接続を終わりました");
+      }
+      $("btnConnect").textContent = "受信機につなぐ";
+      render();
+    }
+  }
+}
+
+async function connectOrDisconnect() {
+  if (port) {
+    if (reader) await reader.cancel();  // readLoop の後始末でポートを閉じる
+    return;
+  }
+  if (!("serial" in navigator)) {
+    setMessage("このブラウザーでは受信機につなげません。パソコンの Chrome か Edge で開いてください");
+    return;
+  }
+  try {
+    const p = await navigator.serial.requestPort();
+    await openPort(p);
+  } catch (e) {
+    if (e && e.name === "NotFoundError") return;  // ポートを選ばずに閉じた
+    setMessage("受信機を開けませんでした。ほかのソフト (シリアルモニターなど) が同じポートを使っていないか確かめてください");
+  }
+}
+
+// ============================================================================
+//  デモ (受信機がなくても、画面の動きを見られる)
+// ============================================================================
+let demoTimers = [];
+let tallyBeforeDemo = null;  // デモの間、本物の集計をよけておく
+
+function stopDemo() {
+  demoTimers.forEach(clearTimeout);
+  demoTimers = [];
+  if (S.source === "demo") {
+    S.source = null;
+    resetSession();
+    S.tally = tallyBeforeDemo || new Map();
+    tallyBeforeDemo = null;
+  }
+  $("btnDemo").textContent = "デモを再生";
+}
+
+function playDemo() {
+  if (S.source === "demo") { stopDemo(); render(); return; }
+  if (port) { setMessage("デモは、受信機を切断してから再生してください"); return; }
+  resetSession();
+  tallyBeforeDemo = S.tally;
+  S.tally = new Map();
+  S.source = "demo";
+  $("btnDemo").textContent = "デモを止める";
+  setMessage("");
+
+  const info = (extra) => JSON.stringify(Object.assign({
+    type: "info", registered: 8, connected: 7, ids: [1, 2, 3, 4, 5, 6, 8], lowBattery: [5],
+    masterBattery: { mv: 3980, low: false }, buzz: null,
+  }, extra));
+  const script = [
+    [0, '{"type":"hello","device":"hayaoshi-receiver","fw":"1.1","channel":1,"group":1}'],
+    [300, '{"type":"master","connected":true,"restarted":false}'],
+    [0, '{"type":"state","master":true,"phase":"open","round":1,"winner":0,"judgeSeq":0,"last":null}'],
+    [200, info({})],
+    [2200, '{"type":"buzz","round":1,"id":3}'],
+    [0, '{"type":"state","master":true,"phase":"locked","round":1,"winner":3,"judgeSeq":0,"last":null}'],
+    [60, info({ buzz: { round: 1, id: 3, elapsedMs: 1840, candidates: 1 } })],
+    [3000, '{"type":"judge","round":1,"id":3,"result":"correct"}'],
+    [0, '{"type":"open","round":2}'],
+    [0, '{"type":"state","master":true,"phase":"open","round":2,"winner":0,"judgeSeq":1,"last":{"result":"correct","id":3}}'],
+    [3200, '{"type":"buzz","round":2,"id":5}'],
+    [0, '{"type":"state","master":true,"phase":"locked","round":2,"winner":5,"judgeSeq":1,"last":{"result":"correct","id":3}}'],
+    [60, info({ buzz: { round: 2, id: 5, elapsedMs: 912, candidates: 2 } })],
+    [2800, '{"type":"judge","round":2,"id":5,"result":"incorrect"}'],
+    [0, '{"type":"open","round":3}'],
+    [0, '{"type":"state","master":true,"phase":"open","round":3,"winner":0,"judgeSeq":2,"last":{"result":"incorrect","id":5}}'],
+    [2600, '{"type":"buzz","round":3,"id":1}'],
+    [60, info({ buzz: { round: 3, id: 1, elapsedMs: 455, candidates: 1 } })],
+    [2600, '{"type":"judge","round":3,"id":1,"result":"correct"}'],
+    [0, '{"type":"open","round":4}'],
+    [0, '{"type":"state","master":true,"phase":"open","round":4,"winner":0,"judgeSeq":3,"last":{"result":"correct","id":1}}'],
+  ];
+  let at = 0;
+  for (const [wait, line] of script) {
+    at += wait;
+    demoTimers.push(setTimeout(() => handleLine(line), at));
+  }
+  demoTimers.push(setTimeout(() => { addLog("デモが終わりました"); stopDemo(); render(); }, at + JUDGE_SHOW_MS + 1500));
+  addLog("デモを始めました (見本のデータです)");
+  render();
+}
+
+// ============================================================================
+//  はじめに
+// ============================================================================
+$("btnConnect").addEventListener("click", connectOrDisconnect);
+$("btnDemo").addEventListener("click", playDemo);
+$("btnReset").addEventListener("click", () => { S.tally.clear(); render(); });
+setInterval(render, 250);  // 正解 / 不正解の表示を、時間がたったら消す
+
+if ("serial" in navigator) {
+  navigator.serial.addEventListener("disconnect", (ev) => {
+    if (ev.target === port && reader) reader.cancel().catch(() => {});
+  });
+  // 前に許可した受信機が 1 つだけつながっていれば、ページを開いたときに自動でつなぐ
+  navigator.serial.getPorts().then((ports) => {
+    if (ports.length === 1 && !port) openPort(ports[0]).catch(() => {});
+  });
+} else {
+  setMessage("このブラウザーでは受信機につなげません (デモは見られます)。パソコンの Chrome か Edge で開いてください");
+}
+
+// ほかのスクリプトから使うための入口 (例: hayaoshi.handleLine('{"type":"buzz","round":1,"id":2}'))
+window.hayaoshi = { handleLine, state: S };
+render();
+</script>
+</body>
+</html>
