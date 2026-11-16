@@ -4,7 +4,8 @@
     python hardware/wiring/make_diagrams.py
 
 - 標準ライブラリだけで動く。出力は docs/images/wiring/*.svg
-- docs/soldering-guide.md の <!-- AUTO:名前 --> 〜 <!-- /AUTO --> の間の表も、同じデータから書き直す
+- docs/soldering-guide.md と docs/hub-stripboard.md の <!-- AUTO:名前 --> 〜 <!-- /AUTO --> の間の表も、
+  同じデータから書き直す
 - 配線の内容は下の「データ」に 1 か所だけ書いてあり、図はすべてそこから描く
 - 描く前に「中継基板 + 線」をたどった接続が、期待する回路 (EXPECTED_*) と同じかを照合する。
   食い違っていたら図を作らずにエラーで止まる
@@ -20,6 +21,7 @@ from pathlib import Path
 
 OUT = Path(__file__).resolve().parents[2] / "docs" / "images" / "wiring"
 GUIDE = Path(__file__).resolve().parents[2] / "docs" / "soldering-guide.md"
+STRIP_GUIDE = Path(__file__).resolve().parents[2] / "docs" / "hub-stripboard.md"
 FONT = "'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP','Yu Gothic',Meiryo,sans-serif"
 
 # 線の色 (図の色, 手順書に書く色の例)
@@ -1016,8 +1018,8 @@ TOP_PLATE = {"led", "btn", "ok", "ng"}  # 天板に付く部品。天板を開�
 
 def end_text(pic: Pictorial, w: Wire, end: tuple, holes: dict) -> str:
     if end[0] == "hub":
-        col, row = next(k for k, v in holes.items() if v.num == w.num)
-        return f"中継基板 **{row} 行** ({ROW_INFO[row][0]}) の穴 `{col}{row}`"
+        row = end[1]
+        return f"中継基板の **{w.num} 番の穴** ({row} 行: {ROW_INFO[row][0]})"
     m = pic.mods[end[0]]
     key = end[1].split("#")[0]
     label = next(lb for k, lb in m.pins if k == key).replace("＋", "+")
@@ -1047,49 +1049,65 @@ def step_table(pic: Pictorial, nums, holes: dict) -> str:
 
 
 PART_ORDER = ["R1k", "R10k", "Rb", "Rt", "R330", "Rtx", "Rrx", "J1", "J2", "Di", "Cc", "Q", "Ce", "Cdf"]
+# 部品: (名前, 注文した基板での注意, ストリップ基板での注意)
 PART_TEXT = {
-    "J1": ("ジャンパー (切り落とした抵抗の足で作る)", "**ストリップ基板だけ。** コの字に曲げて挿す"),
-    "R1k": ("抵抗 1kΩ", ""), "R10k": ("抵抗 10kΩ", ""), "Rb": ("抵抗 100kΩ", ""), "Rt": ("抵抗 100kΩ", ""),
-    "R330": ("抵抗 330Ω", ""),
-    "Di": ("ダイオード 1N4001", "**帯のある側を 6 行へ** (注文した基板では、3 本線が印刷されている側)"),
-    "Cc": ("セラミックコンデンサ 0.1µF (印字 104)", "向きなし。足を少し広げて挿す"),
-    "Q": ("トランジスタ 2SC1815", "**印字のある平らな面を右 (n 列側) へ** (注文した基板では、二重線が印刷されている側)。足を広げて 3 つの穴に"),
-    "Ce": ("電解コンデンサ 1000µF", "**長い足 (＋) を 6 行、帯のある側 (−) を 4 行へ** (注文した基板では、＋ の印がある穴に長い足)"),
-    "J2": ("ジャンパー線 (被覆つきの電線 約 4cm)", "**ストリップ基板だけ。** ほかの線のじゃまにならないよう基板の端を通す"),
-    "Rtx": ("抵抗 1kΩ", ""), "Rrx": ("抵抗 1kΩ", ""),
-    "Cdf": ("電解コンデンサ 1000µF", "**長い足 (＋) を 10 行、帯のある側 (−) を 12 行へ** (注文した基板では、＋ の印がある穴に長い足)"),
+    "J1": ("ジャンパー (切り落とした抵抗の足で作る)", "", "コの字に曲げて挿す"),
+    "R1k": ("抵抗 1kΩ", "", ""), "R10k": ("抵抗 10kΩ", "", ""), "Rb": ("抵抗 100kΩ", "", ""), "Rt": ("抵抗 100kΩ", "", ""),
+    "R330": ("抵抗 330Ω", "", ""),
+    "Di": ("ダイオード 1N4001", "**帯のある側を、3 本線が印刷されている側へ**", "**帯のある側を 6 行へ**"),
+    "Cc": ("セラミックコンデンサ 0.1µF (印字 104)", "向きなし。足を少し広げて挿す", "向きなし。足を少し広げて挿す"),
+    "Q": ("トランジスタ 2SC1815", "**印字のある平らな面を、二重線が印刷されている側へ**。足を広げて 3 つの穴に",
+          "**印字のある平らな面を右 (n 列側) へ**。足を広げて 3 つの穴に"),
+    "Ce": ("電解コンデンサ 1000µF", "**長い足を `+` の印の穴へ**", "**長い足 (＋) を 6 行、帯のある側 (−) を 4 行へ**"),
+    "J2": ("ジャンパー線 (被覆つきの電線 約 4cm)", "", "ほかの線のじゃまにならないよう基板の端を通す"),
+    "Rtx": ("抵抗 1kΩ", "", ""), "Rrx": ("抵抗 1kΩ", "", ""),
+    "Cdf": ("電解コンデンサ 1000µF", "**長い足を `+` の印の穴へ**", "**長い足 (＋) を 10 行、帯のある側 (−) を 12 行へ**"),
 }
 
 
 def parts_table() -> str:
-    rows = ["| 順 | 部品 | 注文した基板の印刷 | ストリップ基板の穴 | 向き・注意 | 使う機種 |", "| :---: | --- | :---: | --- | --- | :---: |"]
+    """注文した基板 (プリント基板) に付ける部品。ジャンパーは基板の中の配線になっているので入らない"""
+    rows = ["| 順 | 部品 | 基板の印刷 | 向き・注意 | 使う機種 |", "| :---: | --- | :---: | --- | :---: |"]
     by_key = {p.key: p for p in PARTS}
-    for i, key in enumerate(PART_ORDER, 1):
+    i = 0
+    for key in PART_ORDER:
         p = by_key[key]
-        name, note = PART_TEXT[key]
-        if p.kind == "npn":
-            holes = " ・ ".join(f"`{c}{r}` ({n})" for n, c, r in p.pins)
-        else:
-            pins = sorted(p.pins, key=lambda x: x[2])
-            holes = " と ".join(f"`{c}{r}`" for _n, c, r in pins)
-        silk = "(いらない)" if p.kind == "jumper" else f"`{PCB_LABEL[p.label]}`"
-        rows.append(f"| {i} | {name} | {silk} | {holes} | {note or '向きなし'} | {'親機だけ' if p.master_only else '両方'} |")
+        if p.kind == "jumper":
+            continue
+        i += 1
+        name, note, _strip = PART_TEXT[key]
+        rows.append(f"| {i} | {name} | `{PCB_LABEL[p.label]}` | {note or '向きなし'} | {'親機だけ' if p.master_only else '両方'} |")
     return "\n".join(rows)
 
 
-def update_guide(blocks: dict) -> None:
-    """手順書の <!-- AUTO:名前 --> 〜 <!-- /AUTO --> の間を書き直す"""
-    if not GUIDE.exists():
-        print(f"  {GUIDE.name} がないので表は書き出しません")
+def strip_parts_table() -> str:
+    """ストリップ基板で作るときの部品と穴の場所"""
+    rows = ["| 順 | 部品 | 足を挿す穴 | 向き・注意 | 使う機種 |", "| :---: | --- | --- | --- | :---: |"]
+    by_key = {p.key: p for p in PARTS}
+    for i, key in enumerate(PART_ORDER, 1):
+        p = by_key[key]
+        name, _pcb, note = PART_TEXT[key]
+        if p.kind == "npn":
+            holes = " ・ ".join(f"`{c}{r}` ({n})" for n, c, r in p.pins)
+        else:
+            holes = " と ".join(f"`{c}{r}`" for _n, c, r in sorted(p.pins, key=lambda x: x[2]))
+        rows.append(f"| {i} | {name} | {holes} | {note or '向きなし'} | {'親機だけ' if p.master_only else '両方'} |")
+    return "\n".join(rows)
+
+
+def update_doc(path: Path, blocks: dict) -> None:
+    """資料の <!-- AUTO:名前 --> 〜 <!-- /AUTO --> の間を書き直す"""
+    if not path.exists():
+        print(f"  {path.name} がないので表は書き出しません")
         return
-    text = GUIDE.read_text(encoding="utf-8")
+    text = path.read_text(encoding="utf-8")
     for name, body in blocks.items():
         pat = re.compile(rf"(<!-- AUTO:{re.escape(name)} -->\n).*?(<!-- /AUTO -->)", re.S)
         if not pat.search(text):
-            raise SystemExit(f"{GUIDE.name} に <!-- AUTO:{name} --> がありません")
+            raise SystemExit(f"{path.name} に <!-- AUTO:{name} --> がありません")
         text = pat.sub(lambda m: m.group(1) + body + "\n" + m.group(2), text)
-    GUIDE.write_text(text, encoding="utf-8")
-    print(f"  {GUIDE.name} の表を {len(blocks)} か所更新しました")
+    path.write_text(text, encoding="utf-8")
+    print(f"  {path.name} の表を {len(blocks)} か所更新しました")
 
 
 def main() -> None:
@@ -1112,7 +1130,8 @@ def main() -> None:
     draw_pins_child(OUT / "pins_child.svg")
     draw_pins_master(OUT / "pins_master.svg")
     print(f"  {len(list(OUT.glob('*.svg')))} 個の SVG を docs/images/wiring/ に書き出しました")
-    update_guide(blocks)
+    update_doc(GUIDE, blocks)
+    update_doc(STRIP_GUIDE, {"strip-parts": strip_parts_table()})
 
 
 if __name__ == "__main__":
