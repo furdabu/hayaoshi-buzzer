@@ -101,7 +101,7 @@ def build_html() -> str:
     html = re.sub(r"<h([1-4])>(.*?)</h\1>", heading, html)
     html = re.sub(r'href="([^"]+)"', link, html)
     html = re.sub(r'src="([^"]+)"', lambda m: f'src="{(DOCS / m.group(1)).resolve().as_uri()}"', html)
-    sub = f'<p class="sub">ヤブイヌ式 早押しクイズボタン MK.1　/　{datetime.date.today():%Y-%m-%d} 版</p>'
+    sub = f'<p class="sub">ヤブイヌ式 早押しボタン MK.1　/　{datetime.date.today():%Y-%m-%d} 版</p>'
     html = html.replace("</h1>", "</h1>\n" + sub, 1)
     return (f'<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>はんだ付けマニュアル</title>'
             f"<style>{CSS}</style></head><body>{html}</body></html>")
